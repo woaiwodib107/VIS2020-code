@@ -6,12 +6,21 @@ class NodeLink extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = { date: new Date() }
+		this.lassoNdoes = []
+		this.nodeFill = {
+			r: 36 / 255,
+			g: 144 / 255,
+			b: 200 / 255,
+			a: 0.5,
+		}
+		this.nodeR = 5
 	}
 	render() {
 		return (
-			<div id="nodelink">
+			<div id="nodelink" style={{ position: 'relative' }}>
 				<canvas
 					id="nodelink-canvas"
+					style={{ position: 'absolute' }}
 					width="1000"
 					height="1000"
 				></canvas>
@@ -28,14 +37,9 @@ class NodeLink extends React.Component {
 		})
 		g.beginBatch()
 		g.nodes().forEach((node) => {
-			node.fill = {
-				r: 36 / 255,
-				g: 144 / 255,
-				b: 200 / 255,
-				a: 0.5,
-			}
+			node.fill = this.nodeFill
 			node.strokeWidth = 1
-			node.r = 5
+			node.r = this.nodeR
 			node.strokeColor = {
 				r: 200 / 255,
 				g: 36 / 255,
@@ -63,6 +67,27 @@ class NodeLink extends React.Component {
 				nodeClick(obj)
 			})
 			// node.on('drag', console.log)
+		})
+		g.initLasso(document.querySelector('#nodelink'))
+		g.on('lasso', (nodes) => {
+			g.beginBatch()
+			this.lassoNdoes.forEach((n) => {
+				n.fill = this.nodeFill
+				n.r = this.nodeR
+			})
+			console.log(nodes)
+			this.lassoNdoes = nodes
+			nodes.forEach((n) => {
+				n.fill = {
+					r: 255 / 255,
+					g: 0,
+					b: 0,
+					a: 1,
+				}
+				n.r = 8
+			})
+			g.endBatch()
+			g.refresh()
 		})
 	}
 }
