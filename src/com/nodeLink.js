@@ -1,6 +1,7 @@
 import React from 'react'
 import { G } from './G.js'
 import { GraphData } from '../data/GraphData'
+import { Switch } from 'antd'
 // console.log(G)
 class NodeLink extends React.Component {
 	constructor(props) {
@@ -14,6 +15,19 @@ class NodeLink extends React.Component {
 			a: 0.5,
 		}
 		this.nodeR = 5
+		GraphData.nodes.forEach((node, i) => {
+			node.renderID = i
+		})
+		this.g = new G({
+			data: GraphData,
+		})
+		this.switchOnchange = (checked) => {
+			if (checked) {
+				this.g.toggleLasso(true)
+			} else {
+				this.g.toggleLasso(false)
+			}
+		}
 	}
 	render() {
 		return (
@@ -24,6 +38,12 @@ class NodeLink extends React.Component {
 					width="1000"
 					height="1000"
 				></canvas>
+				<Switch
+					checkedChildren="ON"
+					unCheckedChildren="OFF"
+					defaultChecked
+					onChange={this.switchOnchange}
+				/>
 			</div>
 		)
 	}
@@ -31,14 +51,13 @@ class NodeLink extends React.Component {
 		const canvas = document.getElementById('nodelink-canvas')
 		const width = canvas.width
 		const height = canvas.height
-		const g = new G({
-			container: canvas,
-			data: GraphData,
-		})
+		const g = this.g
+		g.container(canvas)
 		g.beginBatch()
-		g.nodes().forEach((node) => {
+		g.nodes().forEach((node, i) => {
 			node.fill = this.nodeFill
 			node.strokeWidth = 1
+			node.renderID = i
 			node.r = this.nodeR
 			node.strokeColor = {
 				r: 200 / 255,
@@ -59,6 +78,8 @@ class NodeLink extends React.Component {
 		})
 		g.endBatch()
 		g.refresh()
+		g.on('zoom', () => {})
+		g.on('pan', () => {})
 		const nodeClick = (obj) => {
 			console.log(obj)
 		}
