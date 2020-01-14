@@ -2,19 +2,13 @@ import React from 'react'
 import { G } from './G.js'
 import { GraphData } from '../data/GraphData'
 import { Switch } from 'antd'
+import { nodeStyle, linkStyle } from '../style/nodeLinkStyle'
 // console.log(G)
 class NodeLink extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = { date: new Date() }
 		this.lassoNdoes = []
-		this.nodeFill = {
-			r: 36 / 255,
-			g: 144 / 255,
-			b: 200 / 255,
-			a: 0.5,
-		}
-		this.nodeR = 5
 		GraphData.nodes.forEach((node, i) => {
 			node.renderID = i
 		})
@@ -27,6 +21,23 @@ class NodeLink extends React.Component {
 			} else {
 				this.g.toggleLasso(false)
 			}
+		}
+		this.nodeRefresh = (width, height) => {
+			this.g.beginBatch()
+			this.g.nodes().forEach((node, i) => {
+				node.fill = nodeStyle.fill
+				node.strokeWidth = nodeStyle.strokeWidth
+				node.renderID = i
+				node.r = nodeStyle.r
+				node.strokeColor = nodeStyle.strokeColor
+				node.x = Math.random() * width
+				node.y = Math.random() * height
+			})
+			this.g.links().forEach((link) => {
+				link.strokeColor = linkStyle.strokeColor
+			})
+			this.g.endBatch()
+			this.g.refresh()
 		}
 	}
 	render() {
@@ -53,59 +64,44 @@ class NodeLink extends React.Component {
 		const height = canvas.height
 		const g = this.g
 		g.container(canvas)
-		g.beginBatch()
-		g.nodes().forEach((node, i) => {
-			node.fill = this.nodeFill
-			node.strokeWidth = 1
-			node.renderID = i
-			node.r = this.nodeR
-			node.strokeColor = {
-				r: 200 / 255,
-				g: 36 / 255,
-				b: 144 / 255,
-				a: 0.1,
-			}
-			node.x = Math.random() * width
-			node.y = Math.random() * height
-		})
-		g.links().forEach((link) => {
-			link.strokeColor = {
-				r: 153 / 255,
-				g: 153 / 255,
-				b: 153 / 255,
-				a: 0.1,
-			}
-		})
-		g.endBatch()
-		g.refresh()
+		this.nodeRefresh(width, height)
 		g.on('zoom', () => {})
 		g.on('pan', () => {})
 		const nodeClick = (obj) => {
-			console.log(obj)
+			let node = obj.target
+			g.beginBatch()
+			this.g.nodes().forEach((node) => {
+				node.fill = nodeStyle.fill
+				node.r = nodeStyle.r
+			})
+			node.fill = nodeStyle.clickFill
+			node.r = nodeStyle.clickR
+			g.endBatch()
+			g.refresh()
+			console.log(node)
 		}
 		g.nodes().forEach((node) => {
-			node.on('mousedown', (obj) => {
-				nodeClick(obj)
+			node.on('mousedown', (node) => {
+				nodeClick(node)
 			})
 			// node.on('drag', console.log)
 		})
 		g.initLasso(document.querySelector('#nodelink'))
 		g.on('lasso', (nodes) => {
 			g.beginBatch()
-			this.lassoNdoes.forEach((n) => {
-				n.fill = this.nodeFill
-				n.r = this.nodeR
+			// this.lassoNdoes.forEach((n) => {
+			// 	n.fill = nodeStyle.fill
+			// 	n.r = nodeStyle.r
+			// })
+			this.g.nodes().forEach((node) => {
+				node.fill = nodeStyle.fill
+				node.r = nodeStyle.r
 			})
 			console.log(nodes)
 			this.lassoNdoes = nodes
 			nodes.forEach((n) => {
-				n.fill = {
-					r: 255 / 255,
-					g: 0,
-					b: 0,
-					a: 1,
-				}
-				n.r = 8
+				n.fill = nodeStyle.lassoFill
+				n.r = nodeStyle.lassoR
 			})
 			g.endBatch()
 			g.refresh()
