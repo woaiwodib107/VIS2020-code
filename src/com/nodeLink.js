@@ -1,12 +1,18 @@
 import React from 'react'
 import { G } from './G.js'
+<<<<<<< HEAD
 import { GraphData } from '../data/graphData'
 import { Switch } from 'antd'
 import { nodeStyle, linkStyle } from '../style/nodeLinkStyle'
 // console.log(G)
+=======
+// import { GraphData } from '../data/GraphData'
+import { Switch } from 'antd'
+>>>>>>> add game_player data
 class NodeLink extends React.Component {
 	constructor(props) {
 		super(props)
+		let GraphData = props.graphData
 		this.state = { date: new Date() }
 		this.lassoNdoes = []
 		this.g = new G({

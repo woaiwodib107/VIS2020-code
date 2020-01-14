@@ -16,11 +16,9 @@ const Bar = (props) => {
 		<ResponsiveBar
 			data={data}
 			keys={keys}
-			// keys={[ 'count', 'global', 'local']}
 			indexBy="key"
 			margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
 			padding={0.3}
-			maxValue={100}
 			colors={{ scheme: 'nivo' }}
 			defs={[
 				{
