@@ -5,6 +5,7 @@ import { randomData } from './data/raw'
 import { barData } from './data/barData'
 import { string } from 'prop-types'
 import NodeLink from './com/nodeLink'
+import Projection from './com/projection'
 function App() {
 	const segment = 10
 	let groups = randomData()
@@ -138,9 +139,8 @@ function App() {
 					return <Bar data={r['data']} keys={r['keys']} key={i}></Bar>
 				})}
 			</div>
-			<div style={{ height: 1080, width: 920 }}>
-				<NodeLink />
-			</div>
+			<Projection />
+			<NodeLink />
 		</div>
 	)
 }

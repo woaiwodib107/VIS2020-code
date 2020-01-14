@@ -1,24 +1,16 @@
 import React from 'react'
 import { G } from './G.js'
-import { GraphData } from '../data/graphData'
 import { Switch } from 'antd'
-import { nodeStyle, linkStyle } from '../style/nodeLinkStyle'
-// console.log(G)
-class NodeLink extends React.Component {
+import { ProjectionData } from '../data/prjectionData'
+import { nodeStyle } from '../style/nodeLinkStyle'
+
+class Projection extends React.Component {
 	constructor(props) {
 		super(props)
-		this.state = { date: new Date() }
 		this.lassoNdoes = []
 		this.g = new G({
-			data: GraphData,
+			data: ProjectionData,
 		})
-		this.switchOnchange = (checked) => {
-			if (checked) {
-				this.g.toggleLasso(true)
-			} else {
-				this.g.toggleLasso(false)
-			}
-		}
 		this.nodeRefresh = (width, height) => {
 			this.g.beginBatch()
 			this.g.nodes().forEach((node, i) => {
@@ -30,21 +22,25 @@ class NodeLink extends React.Component {
 				node.x = Math.random() * width
 				node.y = Math.random() * height
 			})
-			this.g.links().forEach((link) => {
-				link.strokeColor = linkStyle.strokeColor
-			})
 			this.g.endBatch()
 			this.g.refresh()
+		}
+		this.switchOnchange = (checked) => {
+			if (checked) {
+				this.g.toggleLasso(true)
+			} else {
+				this.g.toggleLasso(false)
+			}
 		}
 	}
 	render() {
 		return (
-			<div id="nodelink" style={{ position: 'relative' }}>
+			<div id="projection" style={{ position: 'relative' }}>
 				<canvas
-					id="nodelink-canvas"
+					id="projection-canvas"
 					style={{ position: 'absolute' }}
-					width="1000"
-					height="1000"
+					width="300"
+					height="300"
 				></canvas>
 				<Switch
 					checkedChildren="ON"
@@ -56,40 +52,21 @@ class NodeLink extends React.Component {
 		)
 	}
 	componentDidMount() {
-		const canvas = document.getElementById('nodelink-canvas')
+		const canvas = document.getElementById('projection-canvas')
 		const width = canvas.width
 		const height = canvas.height
 		const g = this.g
 		g.container(canvas)
 		this.nodeRefresh(width, height)
+		g.initLasso(document.querySelector('#projection'))
 		g.on('zoom', () => {})
 		g.on('pan', () => {})
-		const nodeClick = (obj) => {
-			let node = obj.target
-			g.beginBatch()
-			this.g.nodes().forEach((node) => {
-				node.fill = nodeStyle.fill
-				node.r = nodeStyle.r
-			})
-			node.fill = nodeStyle.clickFill
-			node.r = nodeStyle.clickR
-			g.endBatch()
-			g.refresh()
-			console.log(node)
-		}
-		g.nodes().forEach((node) => {
-			node.on('mousedown', (node) => {
-				nodeClick(node)
-			})
-			// node.on('drag', console.log)
-		})
-		g.initLasso(document.querySelector('#nodelink'))
 		g.on('lasso', (nodes) => {
 			g.beginBatch()
-			// this.lassoNdoes.forEach((n) => {
-			// 	n.fill = nodeStyle.fill
-			// 	n.r = nodeStyle.r
-			// })
+			this.lassoNdoes.forEach((n) => {
+				n.fill = nodeStyle.fill
+				n.r = nodeStyle.r
+			})
 			this.g.nodes().forEach((node) => {
 				node.fill = nodeStyle.fill
 				node.r = nodeStyle.r
@@ -105,5 +82,4 @@ class NodeLink extends React.Component {
 		})
 	}
 }
-
-export default NodeLink
+export default Projection
