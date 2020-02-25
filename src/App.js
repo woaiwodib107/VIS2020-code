@@ -11,7 +11,7 @@ function App() {
       style={{
         padding: "20px",
         display: "grid",
-        gridTemplateColumns: "1fr 3fr",
+        gridTemplateColumns: "7fr 9fr",
         gridTemplateRows: "1fr 1fr",
         gridGap: "10px",
         placeItems: "center center",
@@ -24,7 +24,7 @@ function App() {
       <div>
         <Charts graphData={graphData} />
       </div>
-      <div style={{ gridRowStart: "span 2" }}>
+      <div style={{ gridRowStart: "span 2", placeSelf: "center center" }}>
         <NodeLink graphData={graphData} />
       </div>
     </div>
