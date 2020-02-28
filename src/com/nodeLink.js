@@ -96,7 +96,6 @@ class NodeLink extends React.Component {
         node.fill = nodeStyle.fill;
         node.r = nodeStyle.r;
       });
-      console.log(nodes);
       this.lassoNdoes = nodes;
       nodes.forEach(n => {
         n.fill = nodeStyle.lassoFill;

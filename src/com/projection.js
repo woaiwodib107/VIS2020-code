@@ -1,13 +1,18 @@
 import React from "react";
 import { G } from "./G.js";
 import { Switch } from "antd";
-import { ProjectionData } from "../data/prjectionData";
 import { nodeStyle } from "../style/nodeLinkStyle";
-
+// import { ProjectionData } from "../data/prjectionData";
 class Projection extends React.Component {
   constructor(props) {
     super(props);
-    // let ProjectionData = props.projectionData;
+    let projectionData = props.projectionData;
+    let ProjectionData = { nodes: [], links: [] };
+    for (let key in projectionData) {
+      let node = {};
+      node.id = key;
+      ProjectionData["nodes"].push(node);
+    }
     this.lassoNdoes = [];
     this.g = new G({
       data: ProjectionData
@@ -20,8 +25,11 @@ class Projection extends React.Component {
         node.renderID = i;
         node.r = nodeStyle.r;
         node.strokeColor = nodeStyle.strokeColor;
-        node.x = Math.random() * width;
-        node.y = Math.random() * height;
+        node.x = ((+projectionData[node.id]["pca"][0] + 0.05) / 0.15) * width;
+        node.y = ((+projectionData[node.id]["pca"][1] + 0.02) / 0.1) * height;
+        if (i % 1000 == 0) {
+          console.log(typeof node.id);
+        }
       });
       this.g.endBatch();
       this.g.refresh();
@@ -75,7 +83,7 @@ class Projection extends React.Component {
         node.fill = nodeStyle.fill;
         node.r = nodeStyle.r;
       });
-      console.log(nodes);
+      // console.log(nodes);
       this.lassoNdoes = nodes;
       nodes.forEach(n => {
         n.fill = nodeStyle.lassoFill;
