@@ -1,7 +1,9 @@
 import React from "react";
+import "./content.css";
 import { G } from "./G.js";
-import { Switch } from "antd";
+import { Switch, Input } from "antd";
 import { nodeStyle, linkStyle } from "../style/nodeLinkStyle";
+const { Search } = Input;
 class NodeLink extends React.Component {
   constructor(props) {
     super(props);
@@ -36,6 +38,94 @@ class NodeLink extends React.Component {
       this.g.refresh();
     };
   }
+  handleSearchEvent = v => {
+    const orange = { r: 255 / 255, g: 165 / 255, b: 0, a: 1 };
+    const orange2 = { r: 255 / 255, g: 165 / 255, b: 0, a: 0.5 };
+    const red = { r: 1, g: 0, b: 0, a: 1 };
+    const { nodes } = this.props.graphData;
+    const values = v.split(",");
+    values.forEach(value => {
+      const node = this.g.getNodeById(value);
+      if (node === undefined) {
+        alert("node===undefined");
+      } else {
+        let links = this.g.links();
+        let one_hop_neighbours = [];
+        let two_hop_neighbours = [];
+        let one_hop_links = [];
+        let two_hop_links = [];
+        let getNeighbours = (node, item, node_container, link_container) => {
+          if (item.source === node) {
+            node_container.push(item.target);
+            link_container.push(this.g.getLinkByEnd(node.id, item.target.id));
+          } else if (item.target === node) {
+            node_container.push(item.source);
+            link_container.push(this.g.getLinkByEnd(node.id, item.source.id));
+          }
+        };
+        links.forEach(item => {
+          if (item.source === node) {
+            one_hop_neighbours.push(item.target);
+            one_hop_links.push(this.g.getLinkByEnd(node.id, item.target.id));
+            let one_hop_node = item.target;
+            links.forEach(item => {
+              // if (item.source === one_hop_node && item.source !== node) {
+              //   two_hop_neignbours.push(item.target);
+              //   two_hop_links.push(
+              //     this.g.getLinkByEnd(one_hop_node.id, item.target.id)
+              //   );
+              // } else if (item.target === one_hop_node && item.target !== node) {
+              //   two_hop_neignbours.push(item.source);
+              //   two_hop_links.push(
+              //     this.g.getLinkByEnd(one_hop_node.id, item.source.id)
+              //   );
+              // }
+              if (item.source !== node && item.target !== node) {
+                getNeighbours(
+                  one_hop_node,
+                  item,
+                  two_hop_neighbours,
+                  two_hop_links
+                );
+              }
+            });
+          } else if (item.target === node) {
+            one_hop_neighbours.push(item.source);
+            one_hop_links.push(this.g.getLinkByEnd(node.id, item.source.id));
+            let one_hop_node = item.source;
+            links.forEach(item => {
+              if (item.source !== node && item.target !== node) {
+                getNeighbours(
+                  one_hop_node,
+                  item,
+                  two_hop_neighbours,
+                  two_hop_links
+                );
+              }
+            });
+          }
+        });
+        one_hop_neighbours.forEach(item => {
+          item.fill = orange;
+          item.r = 10;
+        });
+        one_hop_links.forEach(item => {
+          item.strokeWidth = 3;
+          item.strokeColor = orange;
+        });
+        two_hop_neighbours.forEach(item => {
+          item.fill = orange2;
+          item.r = 10;
+        });
+        two_hop_links.forEach(item => {
+          item.strokeWidth = 3;
+          item.strokeColor = orange2;
+        });
+        node.fill = red;
+        this.g.refresh();
+      }
+    });
+  };
   render() {
     return (
       <div
@@ -48,12 +138,19 @@ class NodeLink extends React.Component {
           width="1000"
           height="1000"
         ></canvas>
-        <Switch
-          checkedChildren="ON"
-          unCheckedChildren="OFF"
-          defaultChecked
-          onChange={this.switchOnchange}
-        />
+        <div>
+          <div className="inline">
+            <Switch
+              checkedChildren="ON"
+              unCheckedChildren="OFF"
+              defaultChecked
+              onChange={this.switchOnchange}
+            />
+          </div>
+          <div class="inline">
+            <Search onSearch={value => this.handleSearchEvent(value)}></Search>
+          </div>
+        </div>
       </div>
     );
   }
