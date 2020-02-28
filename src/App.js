@@ -26,7 +26,9 @@ function App() {
           padding: "50px"
         }}
       >
-        <ProjectionView projectionData={projectionData} />
+        <ProjectionView 
+        projectionData={projectionData} 
+        graphData = {graphData}/>
       </div>
       <div
         style={{

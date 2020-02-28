@@ -2,7 +2,6 @@ import React from "react";
 import { G } from "./G.js";
 import { Switch } from "antd";
 import { nodeStyle } from "../style/nodeLinkStyle";
-// import { ProjectionData } from "../data/prjectionData";
 class Projection extends React.Component {
   constructor(props) {
     super(props);
@@ -28,7 +27,6 @@ class Projection extends React.Component {
         node.x = ((+projectionData[node.id]["pca"][0] + 0.05) / 0.15) * width;
         node.y = ((+projectionData[node.id]["pca"][1] + 0.02) / 0.1) * height;
         if (i % 1000 == 0) {
-          console.log(typeof node.id);
         }
       });
       this.g.endBatch();
@@ -64,6 +62,7 @@ class Projection extends React.Component {
     );
   }
   componentDidMount() {
+    let graphData = this.props.graphData;
     const canvas = document.getElementById("projection-canvas");
     const width = canvas.width;
     const height = canvas.height;
@@ -83,9 +82,9 @@ class Projection extends React.Component {
         node.fill = nodeStyle.fill;
         node.r = nodeStyle.r;
       });
-      // console.log(nodes);
       this.lassoNdoes = nodes;
       nodes.forEach(n => {
+        console.log(graphData[n.id]);
         n.fill = nodeStyle.lassoFill;
         n.r = nodeStyle.lassoR;
       });

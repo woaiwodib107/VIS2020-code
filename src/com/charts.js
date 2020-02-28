@@ -1,5 +1,4 @@
 import React from "react";
-// import Bar from "./Bar";
 import Bar from './Bar/index.js'
 import { randomData } from "../data/raw";
 
@@ -134,7 +133,7 @@ class Charts extends React.Component {
       <div
         style={{
           height: 500,
-          width: 500,
+          width: 800,
           padding: "20px",
           display: "grid",
           gridTemplateColumns: "auto auto",
