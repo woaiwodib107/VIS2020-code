@@ -1,0 +1,15 @@
+.tooltip-bg{ 
+    fill: white;
+    /* stroke: rgb(174,174,174); */
+    opacity: 0.9;
+}
+.tooltip-text { 
+    font-size: 10px;
+}
+.grid > line{
+        stroke: #a6a6a6;    
+}
+.grid > text{
+    text-anchor: middle;
+    fill: #a6a6a6;   
+}

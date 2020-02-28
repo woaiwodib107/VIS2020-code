@@ -1,5 +1,6 @@
 import React from "react";
-import Bar from "./Bar";
+// import Bar from "./Bar";
+import Bar from './Bar/index.js'
 import { randomData } from "../data/raw";
 
 class Charts extends React.Component {
@@ -39,7 +40,7 @@ class Charts extends React.Component {
         });
         const result = Object.entries(r).map(d => {
           let e = {};
-          e["key"] = `${l * parseInt(d[0]) + min}-${l * parseInt(d[0]) +
+          e["state"] = `${l * parseInt(d[0]) + min}-${l * parseInt(d[0]) +
             2 * min -
             1}`;
           e["count"] = d[1];
@@ -56,7 +57,7 @@ class Charts extends React.Component {
         });
         const result = Object.entries(r).map(d => {
           let e = {};
-          e["key"] = d[0];
+          e["state"] = d[0];
           e["count"] = d[1];
           return e;
         });
@@ -109,15 +110,17 @@ class Charts extends React.Component {
       if (globalProp > localProp) {
         let diff = globalProp - localProp;
         userData["data"].push({
-          key: key + ": " + selectUser[key],
+          state: key + ": " + selectUser[key],
+          global: 0,
           local: localProp,
           diff: diff
         });
       } else {
         let diff = localProp - globalProp;
         userData["data"].push({
-          key: key + ": " + selectUser[key],
+          state: key + ": " + selectUser[key],
           global: globalProp,
+          local: 0,
           diff: diff
         });
       }
@@ -125,6 +128,8 @@ class Charts extends React.Component {
     resultDataArr.unshift(userData);
   }
   render() {
+    let customerData = this.resultDataArr[0]
+    console.log(customerData)
     return (
       <div
         style={{
@@ -139,8 +144,8 @@ class Charts extends React.Component {
       >
         {this.resultDataArr.map((r, i) => {
           return (
-            <div style={{ height: 250 }}>
-              <Bar data={r["data"]} keys={r["keys"]} key={i}></Bar>
+            <div style={{ height: 250, border:'1px solid #e8e8e8' }} key={i}>
+              <Bar width={300} height={200} data={r.data}/>
             </div>
           );
         })}
