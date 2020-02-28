@@ -1,13 +1,16 @@
 import React from "react";
+import { observer, inject } from "mobx-react";
+import { toJS } from "mobx";
 import Projection from "./projection";
 import { Tabs, Icon, Table, Tag, Radio } from "antd";
-
 const { TabPane } = Tabs;
 
 function callback(key) {
   console.log(key);
 }
 
+@inject("mainStore")
+@observer
 class ProjectionView extends React.Component {
   constructor(props) {
     super(props);
@@ -32,7 +35,9 @@ class ProjectionView extends React.Component {
   render() {
     const rowSelection = {
       onChange: (selectedRowKeys, selectedRows) => {
-        console.log(this.graphDataObj[selectedRows[0]["id"]])
+        let node = this.graphDataObj[selectedRows[0]["id"]];
+        this.props.mainStore.setNodes([node]);
+        console.log(toJS(this.props.mainStore.selectedNodes))
       }
     };
     const columnsAnomaly = [

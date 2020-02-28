@@ -4,6 +4,7 @@
 	"private": true,
 	"dependencies": {
 		"@babel/core": "7.7.4",
+		"@babel/plugin-proposal-decorators": "^7.8.3",
 		"@nivo/bar": "^0.59.2",
 		"@nivo/line": "^0.59.3",
 		"@svgr/webpack": "4.3.3",
@@ -134,8 +135,16 @@
 		]
 	},
 	"babel": {
+		"plugins": [
+		  [
+			"@babel/plugin-proposal-decorators",
+			{
+			  "legacy": true
+			}
+		  ]
+		],
 		"presets": [
-			"react-app"
+		  "react-app"
 		]
-	}
+	  }
 }

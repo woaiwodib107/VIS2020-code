@@ -1,7 +1,12 @@
 import React from "react";
+import { observer, inject } from "mobx-react";
+import { toJS } from "mobx";
 import { G } from "./G.js";
 import { Switch } from "antd";
 import { nodeStyle } from "../style/nodeLinkStyle";
+
+@inject("mainStore")
+@observer
 class Projection extends React.Component {
   constructor(props) {
     super(props);
@@ -83,11 +88,14 @@ class Projection extends React.Component {
         node.r = nodeStyle.r;
       });
       this.lassoNdoes = nodes;
+      let nodesAttr = []
       nodes.forEach(n => {
-        console.log(graphData[n.id]);
+        nodesAttr.push(graphData[n.id]);
         n.fill = nodeStyle.lassoFill;
         n.r = nodeStyle.lassoR;
       });
+      this.props.mainStore.setNodes(nodesAttr);
+      console.log(toJS(this.props.mainStore.selectedNodes))
       g.endBatch();
       g.refresh();
     });
