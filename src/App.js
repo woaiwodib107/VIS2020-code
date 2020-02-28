@@ -1,7 +1,7 @@
 import React from "react";
 import "./App.css";
-import graphData from "./data/42_trade_graph";
-import projectionData from "./data/42_trade_embedding";
+import graphData from "./data/attrs_distribution_topo_data/42_trade_topo_attrs_distribution";
+import projectionData from "./data/pca_cluster_anomaly_data/42_trade_pca_cluster_anomaly";
 import NodeLink from "./com/nodeLink";
 import ProjectionView from "./com/projectionView";
 import Charts from "./com/charts";
@@ -42,7 +42,7 @@ function App() {
           placeSelf: "center center"
         }}
       >
-        <NodeLink graphData={graphData} />
+        {/* <NodeLink graphData={graphData} /> */}
       </div>
     </div>
   );
