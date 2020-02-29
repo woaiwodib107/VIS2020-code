@@ -4,6 +4,7 @@
 	"private": true,
 	"dependencies": {
 		"@babel/core": "7.7.4",
+		"@babel/plugin-proposal-decorators": "^7.8.3",
 		"@nivo/bar": "^0.59.2",
 		"@nivo/line": "^0.59.3",
 		"@svgr/webpack": "4.3.3",
@@ -21,6 +22,7 @@
 		"camelcase": "^5.3.1",
 		"case-sensitive-paths-webpack-plugin": "2.2.0",
 		"css-loader": "3.2.0",
+		"d3": "^5.15.0",
 		"dotenv": "8.2.0",
 		"dotenv-expand": "5.1.0",
 		"eslint": "^6.8.0",
@@ -133,8 +135,16 @@
 		]
 	},
 	"babel": {
+		"plugins": [
+		  [
+			"@babel/plugin-proposal-decorators",
+			{
+			  "legacy": true
+			}
+		  ]
+		],
 		"presets": [
-			"react-app"
+		  "react-app"
 		]
-	}
+	  }
 }

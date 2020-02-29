@@ -96,7 +96,7 @@ export default class BarGroup extends React.Component {
               color: getColor(datum),
               data: {
                 value: d[1] - d[0],
-                id: d.data.state,
+                id: datum.key,
               }
             },
             style: {
@@ -117,6 +117,7 @@ export default class BarGroup extends React.Component {
       width,
       height,
       layout,
+      margin,
       colorScheme,
       xTransform,
     } = this.props;
@@ -169,7 +170,7 @@ export default class BarGroup extends React.Component {
               fill={d.data.color}
               className={`${d.key}`}
               data-key={d.data.data.id}
-              data-value={d.data.data.value}
+              data-value={d.data.data.value?d.data.data.value : ''}
               onMouseOver={(e)=>this.showToolTip(e)}
               onMouseLeave={(e)=>this.hideToolTip()}
               />
@@ -195,6 +196,9 @@ export default class BarGroup extends React.Component {
         />
         <Legend
           keys={keys}
+          height={height}
+          width={width}
+          margin={margin}
           color={getColor}
         /> 
          <ToolTip

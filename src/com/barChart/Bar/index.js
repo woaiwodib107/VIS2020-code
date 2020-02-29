@@ -38,7 +38,7 @@ export default class Bar extends React.PureComponent {
 Bar.defaultProps = {
   margin: {
     left: 30,
-    right: 5,
+    right: 100,
     top: 5,
     bottom: 20,
   },

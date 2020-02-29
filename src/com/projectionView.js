@@ -1,52 +1,72 @@
 import React from "react";
+import { observer, inject } from "mobx-react";
+import { toJS } from "mobx";
 import Projection from "./projection";
-import { Tabs, Icon, Table } from "antd";
-
+import { Tabs, Icon, Table, Tag, Radio } from "antd";
 const { TabPane } = Tabs;
 
 function callback(key) {
   console.log(key);
 }
 
+@inject("mainStore")
+@observer
 class ProjectionView extends React.Component {
   constructor(props) {
     super(props);
-    this.ProjectionData = props.projectionData;
+    let graphData = this.props.graphData;
+    this.graphDataObj = {};
+    graphData["nodes"].forEach((node)=>{
+      let id = node["id"]
+      this.graphDataObj[id] = {}
+      this.graphDataObj[id]["attrs"] = node["attrs"];
+      this.graphDataObj[id]["topo_attrs"] = node["topo_attrs"];
+    })
+    this.projectionData = this.props.projectionData;
+    this.dataSource = [];
+    for(let key in this.projectionData){
+      let node = {}
+      node.id = key;
+      node.isAnomaly = +this.projectionData[key]["an"];
+      node.clusterID = this.projectionData[key]["cl"];
+      this.dataSource.push(node);
+    }
   }
   render() {
-    let projectionData = this.ProjectionData;
-    const dataSource = [
-      {
-        key: "1",
-        name: "胡彦斌",
-        age: 32,
-        address: "西湖区湖底公园1号"
-      },
-      {
-        key: "2",
-        name: "胡彦祖",
-        age: 42,
-        address: "西湖区湖底公园1号"
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        let node = this.graphDataObj[selectedRows[0]["id"]];
+        this.props.mainStore.setNodes([node]);
+        console.log(toJS(this.props.mainStore.selectedNodes))
       }
-    ];
-
-    const columns = [
+    };
+    const columnsAnomaly = [
       {
-        title: "姓名",
-        dataIndex: "name",
-        key: "name"
+      title: "id",
+      dataIndex: "id",
+      key: "id",
       },
       {
-        title: "年龄",
-        dataIndex: "age",
-        key: "age"
-      },
-      {
-        title: "住址",
-        dataIndex: "address",
-        key: "address"
+      title: "isAnomaly",
+      dataIndex: "isAnomaly",
+      key: "isAnomaly",
+      render: text => <Tag color={text===1?"green":"volcano"}>
+              {text===1?"normal":"abnormal"}
+            </Tag>
       }
-    ];
+    ]
+    const columnsCluster = [
+      {
+      title: "id",
+      dataIndex: "id",
+      key: "id",
+      },
+      {
+      title: "clusterID",
+      dataIndex: "clusterID",
+      key: "clusterID"
+      }
+    ]
     return (
       <Tabs defaultActiveKey="1" type="card">
         <TabPane
@@ -58,7 +78,7 @@ class ProjectionView extends React.Component {
           }
           key="1"
         >
-          <Projection projectionData={projectionData} />
+          <Projection projectionData={this.projectionData} graphData = {this.graphDataObj}/>
         </TabPane>
         <TabPane
           tab={
@@ -69,18 +89,42 @@ class ProjectionView extends React.Component {
           }
           key="2"
         >
-          <Table dataSource={dataSource} columns={columns} />
+          <Table 
+          rowSelection={{
+            type: "radio",
+            ...rowSelection,
+          }}
+          dataSource={this.dataSource} 
+          columns={columnsAnomaly} 
+          tableLayout="fixed"
+          size="small"
+          scroll={{
+            x:"200px",
+            y:"200px"
+          }}/>
         </TabPane>
         <TabPane
           tab={
             <span>
               <Icon type="table" />
-              Community
+              Cluster
             </span>
           }
           key="3"
         >
-          <Table dataSource={dataSource} columns={columns} />
+          <Table 
+          rowSelection={{
+            type: "radio",
+            ...rowSelection,
+          }}
+          dataSource={this.dataSource} 
+          columns={columnsCluster} 
+          tableLayout="fixed"
+          size="small"
+          scroll={{
+            x:"200px",
+            y:"200px"
+          }}/>
         </TabPane>
       </Tabs>
     );
