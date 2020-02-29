@@ -1,8 +1,10 @@
 import React from "react";
 import Bar from './Bar/index.js'
 import './index.css'
+import * as d3 from 'd3';
 import { observer, inject } from "mobx-react";
 import { toJS } from "mobx";
+import { FORMERR } from "dns";
 @inject("mainStore")
 @observer
 class Charts extends React.Component {
@@ -63,10 +65,17 @@ class Charts extends React.Component {
     nodesData.state = 'nodes'
     return nodesData
   }
+  hightLight(selectNode){
+    for(let key in selectNode){
+        let d = selectNode[key][1]
+       d3.selectAll(`.${key} .local${d}`).attr('stroke','black')
+    }
+  }
   render() {
     let selectedNodes = toJS(this.props.mainStore.selectedNodes)
     let graphData = []
     if(selectedNodes.length>1){
+      d3.selectAll('.rect').attr('stroke','none')
     this.state.renderData.forEach(d => {
       let data = [...d.data]
       let nodesData = this.computed(selectedNodes,d.title)
@@ -76,6 +85,9 @@ class Charts extends React.Component {
         data
       })
     })      
+    }else if(selectedNodes.length === 1){
+      graphData = this.state.renderData
+      this.hightLight(selectedNodes[0].attrs)
     }else{
       graphData = this.state.renderData
     }

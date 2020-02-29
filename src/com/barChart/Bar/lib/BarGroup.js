@@ -91,7 +91,7 @@ export default class BarGroup extends React.Component {
           width = width > 0 ? width : 0;
           height = height > 0 ? height : 0;
           styles.push({
-            key: `${d.data.state}-${datum.key}`,
+            key: `rect ${d.data.state}${i} ${datum.key}`,
             data: {
               color: getColor(datum),
               data: {

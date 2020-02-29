@@ -13,3 +13,6 @@
     text-anchor: middle;
     fill: #a6a6a6;   
 }
+.rect {
+    stroke-width: 2px;
+}
