@@ -61,27 +61,32 @@ export default class BarGroup extends React.Component {
     let styles = [];
     var keys = [];
     for (var p1 in data[0]) {
-      if (p1 !== 'state' && p1 !== 'total') keys.push(p1);
+      if (p1 !== 'state') keys.push(p1);
     }
     stack()
       .keys(keys)(data)
       .map((datum, i) =>
         datum.map((d, j) => {
           let y = layout === 'horizontal'
-                ? yScale(d.data.state) + padding
-                : yScale(d[1])
+                  ? yScale(d.data.state) +
+                  ((yScale.bandwidth() - padding) / keys.length) * i +
+                  padding / 2
+                : yScale(d[1] - d[0]);
 
           let x = layout === 'horizontal'
-                ? xScale(d[0])
-                : xScale(d.data.state) + padding
+                  ? xScale(0)
+                  : xScale(d.data.state) +
+                    ((xScale.bandwidth() - padding) / keys.length) * i +
+                    padding / 2;
 
           let height = layout === 'horizontal'
-                ? yScale.bandwidth() - padding * 2
-                : -yScale(d[1]) + yScale(d[0])
+                    ? (yScale.bandwidth() - padding) / keys.length
+                    : -yScale(d[1] - d[0]) + yScale(0);
+
 
           let width =layout === 'horizontal'
-                ? xScale(d[1]) - xScale(d[0])
-                : xScale.bandwidth() - padding * 2
+                  ? xScale(d[1] - d[0]) -  xScale(0)
+                  : (xScale.bandwidth() - padding) / keys.length;
 
           width = width > 0 ? width : 0;
           height = height > 0 ? height : 0;
@@ -117,19 +122,16 @@ export default class BarGroup extends React.Component {
     } = this.props;
     var keys = [];
     for (var p1 in data[0]) {
-      if (p1 !== 'state'&&p1 !== 'total') keys.push(p1);
+      if (p1 !== 'state') keys.push(p1);
     }
     let maxVal, xScale, yScale;
-    data.forEach(element => {
-      element.total = 0;
-      keys.map(d => {
-        element.total += element[d];
-      });
-      return element;
-    });
 
     maxVal = max(data, function(d) {
-      return d.total;
+      let max = 0;
+      keys.map(index => {
+        if (d[index] > max) max = d[index];
+      });
+      return max;
     });
 
     let level = data.map(function(d) {

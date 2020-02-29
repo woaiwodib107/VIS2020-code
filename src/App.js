@@ -1,9 +1,9 @@
 import React from "react";
 import "./App.css";
 import graphData from "./data/42_trade_graph";
-import projectionData from "./data/42_trade_embedding";
-import NodeLink from "./com/nodeLink";
-import ProjectionView from "./com/projectionView";
+// import projectionData from "./data/42_trade_embedding";
+// import NodeLink from "./com/nodeLink";
+// import ProjectionView from "./com/projectionView";
 import Charts from "./com/charts";
 function App() {
   return (
@@ -26,7 +26,7 @@ function App() {
           padding: "50px"
         }}
       >
-        <ProjectionView projectionData={projectionData} />
+        {/* <ProjectionView projectionData={projectionData} /> */}
       </div>
       <div
         style={{
@@ -42,7 +42,7 @@ function App() {
           placeSelf: "center center"
         }}
       >
-        <NodeLink graphData={graphData} />
+        {/* <NodeLink graphData={graphData} /> */}
       </div>
     </div>
   );
