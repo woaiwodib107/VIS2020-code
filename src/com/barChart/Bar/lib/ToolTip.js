@@ -57,7 +57,7 @@ export default class ToolTip extends React.PureComponent {
         )}
         <text visibility={visibility} transform={transformText}>
           <tspan x="0" className={this.props.textStyle} textAnchor="middle" dy="5px">
-            {this.props.tooltip.data.key + ' : ' + d3.format(',')(this.props.tooltip.data.value)}
+            {this.props.tooltip.data.key + ' : ' + this.props.format(this.props.tooltip.data.value)}
           </tspan>
         </text>
       </g>

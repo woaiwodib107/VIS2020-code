@@ -42,7 +42,7 @@ export const BarGroupDefaultProps = {
   labelSkipHeight: 4,
   enableLabel: false,
   themeScheme: 'white',
-  colorScheme: 'category1',
+  colorScheme: 'yellow',
   legend: {
     dataFrom: 'keys',
     anchor: 'bottom-right',

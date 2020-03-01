@@ -2,6 +2,11 @@ import { scaleOrdinal, scaleSequential } from 'd3-scale';
 import { interpolate, quantize } from 'd3-interpolate';
 import isArray from 'lodash/isArray';
 import isString from 'lodash/isString';
+export const sequentialColorSchemes = {
+  red: ['#ffb3b9', '#ff6674', '#ff0a20'],
+  blue: ['#b3d1ff', '#66a3ff', '#1774ff'],
+  yellow: ['#ffeab3', '#ffd666', '#ffba00'],
+};
 export const categoricalColorSchemes = {
     category1: [
       '#dd6b66',

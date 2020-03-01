@@ -4,7 +4,9 @@ import * as d3 from 'd3';
 
 export default class Grid extends React.PureComponent {
     render () {
-       const { width, height, yScale, yValues } = this.props;
+       const { width, height, yScale, yValues,format } = this.props;
+      //  console.log(yValues)
+        // let fliterYvalues = yValues.fliter(d => d%10 === 0)
         const yLines = computeGridLines({
             width,
             height,
@@ -16,7 +18,7 @@ export default class Grid extends React.PureComponent {
             <g>
             {yLines.map((line, index) => (
                 <g key={line.key} className={'grid'}>
-                    <text x={line.x1} y={line.y1} dx={-15} dy={5}>{line.key}</text>
+                    <text x={line.x1} y={line.y1} dx={-15} dy={5}>{format(line.key)}</text>
                     <line {...line}/>
                 </g>
               ))}
@@ -27,6 +29,7 @@ export default class Grid extends React.PureComponent {
 
 
 const getScaleValues = (scale, tickCount) => {
+  //debugger
     if (scale.ticks) return scale.ticks(tickCount);
     return scale.domain();
 };
@@ -35,9 +38,11 @@ const computeGridLines = ({
     height,
     scale,
     axis,
-    values = getScaleValues(scale),
+    values = getScaleValues(scale,10),
   }) => {
     const position = scale.bandwidth ? centerScale(scale) : scale;
+    // console.log(values)
+    // let fliterYvalues = values.filter(d => d%10 === 0)
     let lines;
     if (axis === 'x') {
       lines = values

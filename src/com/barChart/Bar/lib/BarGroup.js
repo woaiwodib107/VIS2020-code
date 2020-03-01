@@ -1,6 +1,6 @@
 import React from 'react';
 import { stack } from 'd3-shape';
-import { scaleLinear, scaleBand } from 'd3-scale';
+import { scaleLinear, scaleBand, scaleLog } from 'd3-scale';
 import { max } from 'd3-array';
 import { getColorsGenerator } from './utli';
 import Legend from './Legend'
@@ -8,6 +8,7 @@ import Axis from './Axis'
 import ToolTip from './ToolTip'
 import Grid from './Grid'
 import { BarGroupPropTypes, BarGroupDefaultProps } from './props';
+import * as d3 from 'd3';
 
 export default class BarGroup extends React.Component {
   constructor(props) {
@@ -81,7 +82,7 @@ export default class BarGroup extends React.Component {
 
           let height = layout === 'horizontal'
                     ? (yScale.bandwidth() - padding) / keys.length
-                    : -yScale(d[1] - d[0]) + yScale(0);
+                    : -yScale(d[1] - d[0]) + yScale(1);
 
 
           let width =layout === 'horizontal'
@@ -146,12 +147,15 @@ export default class BarGroup extends React.Component {
           .nice();
       yScale = scaleBand()
         .range([height, 0])
-        .domain(level);
+        .domain(level)
     } else {
-      yScale = scaleLinear()
+      yScale = scaleLog()
+          // .base(0.5)
           .rangeRound([0, height])
-          .domain([maxVal * 1.2, 0])
-          .nice();
+          .domain([100, 1])
+          // .ticks(10, d3.format('.0f'))
+          // .nice();
+          // debugger
       xScale = scaleBand()
         .range([0, width])
         .domain(level);
@@ -184,7 +188,10 @@ export default class BarGroup extends React.Component {
         <Grid
           yScale={yScale}
           width={width}
-          height={height}/>
+          height={height}
+          format={ d3.format("")}
+          yValues={[10,30,50,100]}
+          />
        {barPart} 
        <Axis
           scale={xScale}
@@ -204,6 +211,7 @@ export default class BarGroup extends React.Component {
          <ToolTip
           textStyle="tooltip-text"
           bgStyle="tooltip-bg"
+          format={ d3.format(".0%")}
           tooltip={this.state.tooltip}
           />
       </g>

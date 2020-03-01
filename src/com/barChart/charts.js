@@ -18,6 +18,12 @@ class Charts extends React.Component {
   }
   componentDidMount(){
     let over = this.renderlocalGlobal()
+    //根据欧氏距离排序
+    // console.log(over)
+    over.sort((a,b)=>{
+     // console.log(this.varianceArr(a.data[1]) - this.varianceArr(b.data[1]))
+      return this.varianceArr(a.data) - this.varianceArr(b.data)
+    })
     this.setState({
       renderData: over
     })
@@ -25,19 +31,24 @@ class Charts extends React.Component {
   renderlocalGlobal(){
     const {localGlobalData} = this.props
     let overView = []
-    let graphTitles = Object.keys(this.props.localGlobalData).slice(0,6)
+    let graphTitles = Object.keys(localGlobalData).slice(0,6)
     for(let i=0;i<graphTitles.length;i++ ){
         let title = graphTitles[i]
+        let type = localGlobalData[title].num === 2? 'category1' :'yellow' 
         let totalLocal = eval(localGlobalData[title].local_42.join("+"))
         let globalLocal = eval(localGlobalData[title].global_4_42.join("+"))
         let localData = {state: 'local'}
         let globalData = {state: 'global'}
         localGlobalData[title].seg.map( (d, i) =>{
-          localData[d[0] === d[1]? d[0] : `${d[0]}-${d[1]}`] = localGlobalData[title].local_42[i] / totalLocal
-          globalData[d[0] === d[1]? d[0] : `${d[0]}-${d[1]}`] = localGlobalData[title].global_4_42[i] / globalLocal
+          localData[d[0] === d[1]? d[0] : `${d[0]}-${d[1]}`] = parseInt(localGlobalData[title].local_42[i] / totalLocal * 100) + 1 
+          globalData[d[0] === d[1]? d[0] : `${d[0]}-${d[1]}`] = parseInt(localGlobalData[title].global_4_42[i] / globalLocal * 100)+ 1
+
+          // 0的情况用1代替
+
         })
         overView.push({
           title,
+          type,
           data : [localData,globalData]
         })
     }
@@ -60,7 +71,7 @@ class Charts extends React.Component {
       }
     })
     for(let key in nodesData){
-      nodesData[key] = nodesData[key] / sum
+      nodesData[key] = parseInt(nodesData[key] / sum  * 100)+ 1
     }
     nodesData.state = 'nodes'
     return nodesData
@@ -70,6 +81,27 @@ class Charts extends React.Component {
         let d = selectNode[key][1]
        d3.selectAll(`.${key} .local${d}`).attr('stroke','black')
     }
+  }
+  varianceArr(arr){
+    let diff = 0
+    let local = arr[0]
+    let localData = []
+    let global = arr[1]
+    let globalData = []
+    for(let key in local){
+      if(key !== 'state'){
+        localData.push(local[key])
+      }
+    }
+    for(let key in global){
+      if(key !== 'state'){
+        globalData.push(global[key])
+      }
+    }
+    for(let i=0;i<localData.length;i++){
+      diff += Math.pow(localData[i] - globalData[i])
+    }
+    return Math.sqrt(diff)
   }
   render() {
     let selectedNodes = toJS(this.props.mainStore.selectedNodes)
@@ -82,6 +114,7 @@ class Charts extends React.Component {
       data.push(nodesData)
       graphData.push({
         title: d.title,
+        type: d.type,
         data
       })
     })      
@@ -107,7 +140,7 @@ class Charts extends React.Component {
           return (
             <div style={{ height: 250, border:'1px solid #e8e8e8' }} key={r.title} className={r.title}>
             <div className={'title-top'}>{r.title}属性分布图</div>
-              <Bar width={350} height={200} data={r.data}/>
+              <Bar width={350} height={200} data={r.data} colorScheme={r.type}/>
             </div>
           );
         })}
