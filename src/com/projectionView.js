@@ -112,12 +112,12 @@ class ProjectionView extends React.Component {
         width: 60
       }
     ];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < this.clusterMaxNum; i++) {
       columnsCluster.push({
         title: "id_" + i,
         dataIndex: "id_" + i,
         key: "id_" + i,
-        width: 200
+        width: 100
       });
     }
 
@@ -179,8 +179,8 @@ class ProjectionView extends React.Component {
             columns={columnsCluster}
             size="small"
             scroll={{
-              x: "400px",
-              y: "300px"
+              x: 300,
+              y: 300
             }}
           />
         </TabPane>

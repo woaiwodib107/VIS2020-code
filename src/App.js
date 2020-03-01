@@ -23,6 +23,7 @@ function App() {
     >
       <div
         style={{
+          width: "500px",
           placeSelf: "start center",
           padding: "50px"
         }}
