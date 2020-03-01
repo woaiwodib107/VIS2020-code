@@ -49,13 +49,13 @@ class Projection extends React.Component {
     return (
       <div
         id="projection"
-        style={{ position: "relative", width: "300px", height: "300px" }}
+        style={{ position: "relative", width: "400px", height: "400px" }}
       >
         <canvas
           id="projection-canvas"
           style={{ position: "absolute" }}
-          width="300"
-          height="300"
+          width="400"
+          height="400"
         ></canvas>
         <Switch
           checkedChildren="ON"
@@ -88,14 +88,14 @@ class Projection extends React.Component {
         node.r = nodeStyle.r;
       });
       this.lassoNdoes = nodes;
-      let nodesAttr = []
+      let nodesAttr = [];
       nodes.forEach(n => {
         nodesAttr.push(graphData[n.id]);
         n.fill = nodeStyle.lassoFill;
         n.r = nodeStyle.lassoR;
       });
       this.props.mainStore.setNodes(nodesAttr);
-      console.log(toJS(this.props.mainStore.selectedNodes))
+      console.log(toJS(this.props.mainStore.selectedNodes));
       g.endBatch();
       g.refresh();
     });

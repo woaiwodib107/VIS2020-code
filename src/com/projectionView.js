@@ -2,13 +2,9 @@ import React from "react";
 import { observer, inject } from "mobx-react";
 import { toJS } from "mobx";
 import Projection from "./projection";
+import globalData from "../data/pca_cluster_anomaly_data/4_and_42_trade_pca_cluster_anomaly";
 import { Tabs, Icon, Table, Tag, Radio } from "antd";
 const { TabPane } = Tabs;
-
-function callback(key) {
-  console.log(key);
-}
-
 @inject("mainStore")
 @observer
 class ProjectionView extends React.Component {
@@ -16,57 +12,115 @@ class ProjectionView extends React.Component {
     super(props);
     let graphData = this.props.graphData;
     this.graphDataObj = {};
-    graphData["nodes"].forEach((node)=>{
-      let id = node["id"]
-      this.graphDataObj[id] = {}
+    graphData["nodes"].forEach(node => {
+      let id = node["id"];
+      this.graphDataObj[id] = {};
       this.graphDataObj[id]["attrs"] = node["attrs"];
       this.graphDataObj[id]["topo_attrs"] = node["topo_attrs"];
-    })
+    });
     this.projectionData = this.props.projectionData;
-    this.dataSource = [];
-    for(let key in this.projectionData){
-      let node = {}
+    this.clusterTypeNum = 10;
+    this.clusterObj = {};
+    this.dataSourceAnomaly = [];
+    this.dataSourceCluster = [];
+    for (let key in this.projectionData) {
+      let node = {};
       node.id = key;
-      node.isAnomaly = +this.projectionData[key]["an"];
-      node.clusterID = this.projectionData[key]["cl"];
-      this.dataSource.push(node);
+      node.isAnomalyLocal = +this.projectionData[key]["an"];
+      node.isAnomalyGlobal = +globalData[key]["an"];
+      this.dataSourceAnomaly.push(node);
+      let clusterID = this.projectionData[key]["cl"];
+      if (this.clusterObj[clusterID] === undefined) {
+        this.clusterObj[clusterID] = [];
+      }
+      this.clusterObj[clusterID].push(key);
     }
+    this.clusterMaxNum = 0;
+    for (let key in this.clusterObj) {
+      if (this.clusterObj[key].length > this.clusterMaxNum) {
+        this.clusterMaxNum = this.clusterObj[key].length;
+      }
+    }
+    for (let i = 0; i < this.clusterTypeNum; i++) {
+      let data = {};
+      data["key"] = i;
+      data["cluster_id"] = i;
+      for (let j = 0; j < this.clusterObj[i].length; j++) {
+        data["id_" + j] = this.clusterObj[i][j];
+      }
+      // for(let j = 0; j < this.clusterMaxNum; j++){
+      //   if(j<this.clusterObj[i].length){
+      //     data['id_'+j] = this.clusterObj[i][j];
+      //   } else {
+      //     data['id_'+j] = 'null';
+      //   }
+      // }
+      this.dataSourceCluster.push(data);
+    }
+    console.log(this.clusterMaxNum);
   }
   render() {
-    const rowSelection = {
+    const rowSelectionAbnomaly = {
       onChange: (selectedRowKeys, selectedRows) => {
         let node = this.graphDataObj[selectedRows[0]["id"]];
         this.props.mainStore.setNodes([node]);
-        console.log(toJS(this.props.mainStore.selectedNodes))
+        console.log(toJS(this.props.mainStore.selectedNodes));
+      }
+    };
+    const rowSelectionCluster = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        let node = this.clusterObj[selectedRows[0]["cluster_id"]].map(
+          id => this.graphDataObj[id]
+        );
+        this.props.mainStore.setNodes(node);
+        console.log(toJS(this.props.mainStore.selectedNodes));
       }
     };
     const columnsAnomaly = [
       {
-      title: "id",
-      dataIndex: "id",
-      key: "id",
+        title: "id",
+        dataIndex: "id",
+        key: "id"
       },
       {
-      title: "isAnomaly",
-      dataIndex: "isAnomaly",
-      key: "isAnomaly",
-      render: text => <Tag color={text===1?"green":"volcano"}>
-              {text===1?"normal":"abnormal"}
-            </Tag>
+        title: "local",
+        dataIndex: "isAnomalyLocal",
+        key: "isAnomalyLocal",
+        render: text => (
+          <Tag color={text === 1 ? "green" : "volcano"}>
+            {text === 1 ? "normal" : "abnormal"}
+          </Tag>
+        )
+      },
+      {
+        title: "global",
+        dataIndex: "isAnomalyGlobal",
+        key: "isAnomalyGlobal",
+        render: text => (
+          <Tag color={text === 1 ? "green" : "volcano"}>
+            {text === 1 ? "normal" : "abnormal"}
+          </Tag>
+        )
       }
-    ]
+    ];
     const columnsCluster = [
       {
-      title: "id",
-      dataIndex: "id",
-      key: "id",
-      },
-      {
-      title: "clusterID",
-      dataIndex: "clusterID",
-      key: "clusterID"
+        title: "cluster",
+        dataIndex: "cluster_id",
+        key: "cluster_id",
+        fixed: "left",
+        width: 60
       }
-    ]
+    ];
+    for (let i = 0; i < 3; i++) {
+      columnsCluster.push({
+        title: "id_" + i,
+        dataIndex: "id_" + i,
+        key: "id_" + i,
+        width: 200
+      });
+    }
+
     return (
       <Tabs defaultActiveKey="1" type="card">
         <TabPane
@@ -78,7 +132,10 @@ class ProjectionView extends React.Component {
           }
           key="1"
         >
-          <Projection projectionData={this.projectionData} graphData = {this.graphDataObj}/>
+          <Projection
+            projectionData={this.projectionData}
+            graphData={this.graphDataObj}
+          />
         </TabPane>
         <TabPane
           tab={
@@ -89,19 +146,20 @@ class ProjectionView extends React.Component {
           }
           key="2"
         >
-          <Table 
-          rowSelection={{
-            type: "radio",
-            ...rowSelection,
-          }}
-          dataSource={this.dataSource} 
-          columns={columnsAnomaly} 
-          tableLayout="fixed"
-          size="small"
-          scroll={{
-            x:"200px",
-            y:"200px"
-          }}/>
+          <Table
+            rowSelection={{
+              type: "radio",
+              ...rowSelectionAbnomaly
+            }}
+            dataSource={this.dataSourceAnomaly}
+            columns={columnsAnomaly}
+            tableLayout="fixed"
+            size="small"
+            scroll={{
+              x: "400px",
+              y: "300px"
+            }}
+          />
         </TabPane>
         <TabPane
           tab={
@@ -112,19 +170,19 @@ class ProjectionView extends React.Component {
           }
           key="3"
         >
-          <Table 
-          rowSelection={{
-            type: "radio",
-            ...rowSelection,
-          }}
-          dataSource={this.dataSource} 
-          columns={columnsCluster} 
-          tableLayout="fixed"
-          size="small"
-          scroll={{
-            x:"200px",
-            y:"200px"
-          }}/>
+          <Table
+            rowSelection={{
+              type: "radio",
+              ...rowSelectionCluster
+            }}
+            dataSource={this.dataSourceCluster}
+            columns={columnsCluster}
+            size="small"
+            scroll={{
+              x: "400px",
+              y: "300px"
+            }}
+          />
         </TabPane>
       </Tabs>
     );
