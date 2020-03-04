@@ -1,9 +1,14 @@
 import React from "react";
 import "./content.css";
 import { G } from "./G.js";
-import { Switch, Input } from "antd";
+import { Switch, Input, Slider } from "antd";
 import { nodeStyle, linkStyle } from "../style/nodeLinkStyle";
 const { Search } = Input;
+const marks = {
+  1: "1",
+  2: "2",
+  3: "3"
+};
 class NodeLink extends React.Component {
   constructor(props) {
     super(props);
@@ -38,13 +43,25 @@ class NodeLink extends React.Component {
       this.g.refresh();
     };
   }
-  handleSearchEvent = v => {
+  initNodeStyle = () => {
+    this.g.nodes().forEach(node => {
+      node.fill = nodeStyle.fill;
+      node.strokeWidth = nodeStyle.strokeWidth;
+      node.r = nodeStyle.r;
+    });
+    // this.g.refresh();
+  };
+  handleHopEvent = hop_value => {
+    // const { node_list } = this.props;
+    // this.nodeRefresh();
+    this.initNodeStyle();
+    const node_list = ["1300550662", "1300423168"];
+    if (node_list === undefined) return;
     const orange = { r: 255 / 255, g: 165 / 255, b: 0, a: 1 };
     const orange2 = { r: 255 / 255, g: 165 / 255, b: 0, a: 0.5 };
     const red = { r: 1, g: 0, b: 0, a: 1 };
-    const { nodes } = this.props.graphData;
-    const values = v.split(",");
-    values.forEach(value => {
+    // const { nodes } = this.props.graphData;
+    node_list.forEach(value => {
       const node = this.g.getNodeById(value);
       if (node === undefined) {
         alert("node===undefined");
@@ -57,16 +74,16 @@ class NodeLink extends React.Component {
         let getNeighbours = (node, item, node_container, link_container) => {
           if (item.source === node) {
             node_container.push(item.target);
-            link_container.push(this.g.getLinkByEnd(node.id, item.target.id));
+            // link_container.push(this.g.getLinkByEnd(node.id, item.target.id));
           } else if (item.target === node) {
             node_container.push(item.source);
-            link_container.push(this.g.getLinkByEnd(node.id, item.source.id));
+            // link_container.push(this.g.getLinkByEnd(node.id, item.source.id));
           }
         };
         links.forEach(item => {
           if (item.source === node) {
             one_hop_neighbours.push(item.target);
-            one_hop_links.push(this.g.getLinkByEnd(node.id, item.target.id));
+            // one_hop_links.push(this.g.getLinkByEnd(node.id, item.target.id));
             let one_hop_node = item.target;
             links.forEach(item => {
               // if (item.source === one_hop_node && item.source !== node) {
@@ -91,7 +108,7 @@ class NodeLink extends React.Component {
             });
           } else if (item.target === node) {
             one_hop_neighbours.push(item.source);
-            one_hop_links.push(this.g.getLinkByEnd(node.id, item.source.id));
+            // one_hop_links.push(this.g.getLinkByEnd(node.id, item.source.id));
             let one_hop_node = item.source;
             links.forEach(item => {
               if (item.source !== node && item.target !== node) {
@@ -105,22 +122,25 @@ class NodeLink extends React.Component {
             });
           }
         });
-        one_hop_neighbours.forEach(item => {
-          item.fill = orange;
-          item.r = 10;
-        });
-        one_hop_links.forEach(item => {
-          item.strokeWidth = 3;
-          item.strokeColor = orange;
-        });
-        two_hop_neighbours.forEach(item => {
-          item.fill = orange2;
-          item.r = 10;
-        });
-        two_hop_links.forEach(item => {
-          item.strokeWidth = 3;
-          item.strokeColor = orange2;
-        });
+        if (hop_value === 1) {
+          one_hop_neighbours.forEach(item => {
+            item.fill = orange;
+            item.r = 10;
+          });
+          // one_hop_links.forEach(item => {
+          //   item.strokeWidth = 3;
+          //   item.strokeColor = orange;
+          // });
+        } else if (hop_value === 2) {
+          two_hop_neighbours.forEach(item => {
+            item.fill = orange2;
+            item.r = 10;
+          });
+          // two_hop_links.forEach(item => {
+          //   item.strokeWidth = 3;
+          //   item.strokeColor = orange2;
+          // });
+        }
         node.fill = red;
         this.g.refresh();
       }
@@ -147,8 +167,19 @@ class NodeLink extends React.Component {
               onChange={this.switchOnchange}
             />
           </div>
-          <div class="inline">
-            <Search onSearch={value => this.handleSearchEvent(value)}></Search>
+          <div className="inline" style={{ width: 200, marginLeft: 100 }}>
+            {/* <Search onSearch={value => this.handleHopEvent(value)}></Search> */}
+            <Slider
+              marks={marks}
+              step={null}
+              defaultValue={20}
+              onAfterChange={value => {
+                this.handleHopEvent(value);
+              }}
+              dots={false}
+              min={0}
+              max={4}
+            />
           </div>
         </div>
       </div>
