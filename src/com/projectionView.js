@@ -18,20 +18,20 @@ class ProjectionView extends React.Component {
       this.graphDataObj[id]["attrs"] = node["attrs"];
       this.graphDataObj[id]["topo_attrs"] = node["topo_attrs"];
     });
-    this.projectionData = this.props.projectionData;
+    this.localData = this.props.localData;
     this.clusterTypeNum = 10;
     this.clusterObj = {};
     this.dataSourceAnomaly = [];
     this.dataSourceCluster = [];
-    for (let key in this.projectionData) {
+    for (let key in this.localData) {
       let node = {};
       node.id = key;
-      node.isAnomalyLocal = +this.projectionData[key]["an"];
+      node.isAnomalyLocal = +this.localData[key]["an"];
       node.isAnomalyGlobal = +globalData[key]["an"];
       if (node.isAnomalyLocal !== 1 || node.isAnomalyGlobal !== 1) {
         this.dataSourceAnomaly.push(node);
       }
-      let clusterID = this.projectionData[key]["cl"];
+      let clusterID = this.localData[key]["cl"];
       if (this.clusterObj[clusterID] === undefined) {
         this.clusterObj[clusterID] = [];
       }
@@ -134,8 +134,9 @@ class ProjectionView extends React.Component {
           key="1"
         >
           <Projection
-            projectionData={this.projectionData}
+            localData={this.localData}
             graphData={this.graphDataObj}
+            globalData={globalData}
           />
         </TabPane>
         <TabPane
@@ -157,8 +158,8 @@ class ProjectionView extends React.Component {
             tableLayout="fixed"
             size="small"
             scroll={{
-              x: "400px",
-              y: "300px"
+              x: 500,
+              y: 500
             }}
           />
         </TabPane>
@@ -181,8 +182,8 @@ class ProjectionView extends React.Component {
             size="small"
             pagination={false}
             scroll={{
-              x: 300,
-              y: 300
+              x: 500,
+              y: 500
             }}
           />
         </TabPane>
