@@ -28,7 +28,9 @@ class ProjectionView extends React.Component {
       node.id = key;
       node.isAnomalyLocal = +this.projectionData[key]["an"];
       node.isAnomalyGlobal = +globalData[key]["an"];
-      this.dataSourceAnomaly.push(node);
+      if (node.isAnomalyLocal !== 1 || node.isAnomalyGlobal !== 1) {
+        this.dataSourceAnomaly.push(node);
+      }
       let clusterID = this.projectionData[key]["cl"];
       if (this.clusterObj[clusterID] === undefined) {
         this.clusterObj[clusterID] = [];
@@ -57,7 +59,6 @@ class ProjectionView extends React.Component {
       // }
       this.dataSourceCluster.push(data);
     }
-    console.log(this.clusterMaxNum);
   }
   render() {
     const rowSelectionAbnomaly = {
@@ -112,7 +113,7 @@ class ProjectionView extends React.Component {
         width: 60
       }
     ];
-    for (let i = 0; i < this.clusterMaxNum; i++) {
+    for (let i = 0; i < 30; i++) {
       columnsCluster.push({
         title: "id_" + i,
         dataIndex: "id_" + i,
@@ -141,7 +142,7 @@ class ProjectionView extends React.Component {
           tab={
             <span>
               <Icon type="table" />
-              Abnormal
+              Anormaly
             </span>
           }
           key="2"
@@ -178,6 +179,7 @@ class ProjectionView extends React.Component {
             dataSource={this.dataSourceCluster}
             columns={columnsCluster}
             size="small"
+            pagination={false}
             scroll={{
               x: 300,
               y: 300
