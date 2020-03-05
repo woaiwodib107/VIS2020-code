@@ -112,8 +112,8 @@ class Projection extends React.Component {
             height="500"
           ></canvas>
         </div>
-        <div>
-          <div style={{ marginTop: -12 }}>
+        <div style={{ position: "absolute", zIndex: "999999" }}>
+          <div>
             <Radio.Group defaultValue="a" size="small">
               <Radio.Button value="a">pca</Radio.Button>
               <Radio.Button value="b" disabled>
@@ -124,7 +124,7 @@ class Projection extends React.Component {
               </Radio.Button>
             </Radio.Group>
           </div>
-          <div style={{ marginTop: 2 }}>
+          <div>
             <Radio.Group
               defaultValue="0"
               size="small"

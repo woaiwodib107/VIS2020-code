@@ -14,11 +14,11 @@ function App() {
       style={{
         width: "1920px",
         height: "1080px",
-        padding: "10px",
+        padding: "8px",
         display: "grid",
         gridTemplateColumns: "auto auto auto auto",
         gridTemplateRows: "1fr 1fr",
-        gridGap: "10px",
+        gridGap: "8px",
         placeItems: "center center",
         gridAutoFlow: "column"
       }}
@@ -70,7 +70,7 @@ function App() {
           padding: "30px"
         }}
       >
-        <NodeLink graphData={graphData} no={0} />
+        {/* <NodeLink graphData={graphData} no={0} /> */}
       </div>
       <div
         style={{
@@ -78,7 +78,7 @@ function App() {
           padding: "30px"
         }}
       >
-        <NodeLink graphData={graphData} no={1} />
+        {/* <NodeLink graphData={graphData} no={1} /> */}
       </div>
     </div>
   );
