@@ -40,13 +40,13 @@ class NodeLink extends React.Component {
     return (
       <div
         id="nodelink"
-        style={{ position: "relative", width: "1000px", height: "1000px" }}
+        style={{ position: "relative", width: "400px", height: "400px" }}
       >
         <canvas
           id="nodelink-canvas"
           style={{ position: "absolute" }}
-          width="1000"
-          height="1000"
+          width="400"
+          height="400"
         ></canvas>
         <Switch
           checkedChildren="ON"
