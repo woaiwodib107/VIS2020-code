@@ -25,20 +25,20 @@ function App() {
     >
       <div
         style={{
+          placeSelf: "center center",
+          padding: "30px"
+        }}
+      >
+        <span> control panel </span>
+      </div>
+      <div
+        style={{
           width: "500px",
           placeSelf: "start center",
           padding: "30px"
         }}
       >
         <ProjectionView localData={localData} graphData={graphData} />
-      </div>
-      <div
-        style={{
-          placeSelf: "center center",
-          padding: "30px"
-        }}
-      >
-        <span> control panel </span>
       </div>
       <div
         style={{

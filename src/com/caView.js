@@ -144,9 +144,12 @@ class CAView extends React.Component {
             columns={columnsAnomaly}
             tableLayout="fixed"
             size="small"
+            pagination={{
+              defaultPageSize: 30
+            }}
             scroll={{
               x: 500,
-              y: 500
+              y: 860
             }}
           />
         </TabPane>
