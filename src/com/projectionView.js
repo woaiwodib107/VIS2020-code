@@ -18,18 +18,20 @@ class ProjectionView extends React.Component {
       this.graphDataObj[id]["attrs"] = node["attrs"];
       this.graphDataObj[id]["topo_attrs"] = node["topo_attrs"];
     });
-    this.projectionData = this.props.projectionData;
+    this.localData = this.props.localData;
     this.clusterTypeNum = 10;
     this.clusterObj = {};
     this.dataSourceAnomaly = [];
     this.dataSourceCluster = [];
-    for (let key in this.projectionData) {
+    for (let key in this.localData) {
       let node = {};
       node.id = key;
-      node.isAnomalyLocal = +this.projectionData[key]["an"];
+      node.isAnomalyLocal = +this.localData[key]["an"];
       node.isAnomalyGlobal = +globalData[key]["an"];
-      this.dataSourceAnomaly.push(node);
-      let clusterID = this.projectionData[key]["cl"];
+      if (node.isAnomalyLocal !== 1 || node.isAnomalyGlobal !== 1) {
+        this.dataSourceAnomaly.push(node);
+      }
+      let clusterID = this.localData[key]["cl"];
       if (this.clusterObj[clusterID] === undefined) {
         this.clusterObj[clusterID] = [];
       }
@@ -57,7 +59,6 @@ class ProjectionView extends React.Component {
       // }
       this.dataSourceCluster.push(data);
     }
-    console.log(this.clusterMaxNum);
   }
   render() {
     const rowSelectionAbnomaly = {
@@ -112,7 +113,7 @@ class ProjectionView extends React.Component {
         width: 60
       }
     ];
-    for (let i = 0; i < this.clusterMaxNum; i++) {
+    for (let i = 0; i < 30; i++) {
       columnsCluster.push({
         title: "id_" + i,
         dataIndex: "id_" + i,
@@ -133,15 +134,16 @@ class ProjectionView extends React.Component {
           key="1"
         >
           <Projection
-            projectionData={this.projectionData}
+            localData={this.localData}
             graphData={this.graphDataObj}
+            globalData={globalData}
           />
         </TabPane>
         <TabPane
           tab={
             <span>
               <Icon type="table" />
-              Abnormal
+              Anormaly
             </span>
           }
           key="2"
@@ -156,8 +158,8 @@ class ProjectionView extends React.Component {
             tableLayout="fixed"
             size="small"
             scroll={{
-              x: "400px",
-              y: "300px"
+              x: 500,
+              y: 500
             }}
           />
         </TabPane>
@@ -178,9 +180,10 @@ class ProjectionView extends React.Component {
             dataSource={this.dataSourceCluster}
             columns={columnsCluster}
             size="small"
+            pagination={false}
             scroll={{
-              x: 300,
-              y: 300
+              x: 500,
+              y: 500
             }}
           />
         </TabPane>
