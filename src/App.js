@@ -1,12 +1,12 @@
 import React from "react";
 import "./App.css";
-import "./com/content.css"
-import graphData from "./data/constructed_graph_add_topology_attributes/42/42_trade_undirected_topo_attrs";
-// import graphData from "./data/1_trade";
-import projectionData from "./data/42_trade_embedding";
+import graphData from "./data/attrs_distribution_topo_data/42_trade_topo_attrs_distribution";
+import localGlobalData from "./data/attrs_distribution_topo_data/attrs_distribution_describe_add_local_global";
+import projectionData from "./data/pca_cluster_anomaly_data/42_trade_pca_cluster_anomaly";
 import NodeLink from "./com/nodeLink";
 import ProjectionView from "./com/projectionView";
-import Charts from "./com/charts";
+import Charts from "./com/barChart/charts";
+import "./com/content.css";
 function App() {
   return (
     <div
@@ -24,11 +24,12 @@ function App() {
     >
       <div
         style={{
+          width: "500px",
           placeSelf: "start center",
           padding: "50px"
         }}
       >
-        {/* <ProjectionView projectionData={projectionData} />   */}
+        <ProjectionView projectionData={projectionData} graphData={graphData} />
       </div>
       <div
         style={{
@@ -36,7 +37,7 @@ function App() {
           padding: "30px"
         }}
       >
-        <Charts graphData={graphData} />
+        <NodeLink graphData={graphData} />
       </div>
       <div
         style={{
@@ -44,7 +45,7 @@ function App() {
           placeSelf: "center center"
         }}
       >
-        <NodeLink graphData={graphData} />
+        <Charts localGlobalData={localGlobalData} />
       </div>
     </div>
   );

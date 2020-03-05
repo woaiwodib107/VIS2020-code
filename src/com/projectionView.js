@@ -1,52 +1,126 @@
 import React from "react";
+import { observer, inject } from "mobx-react";
+import { toJS } from "mobx";
 import Projection from "./projection";
-import { Tabs, Icon, Table } from "antd";
-
+import globalData from "../data/pca_cluster_anomaly_data/4_and_42_trade_pca_cluster_anomaly";
+import { Tabs, Icon, Table, Tag, Radio } from "antd";
 const { TabPane } = Tabs;
-
-function callback(key) {
-  console.log(key);
-}
-
+@inject("mainStore")
+@observer
 class ProjectionView extends React.Component {
   constructor(props) {
     super(props);
-    this.ProjectionData = props.projectionData;
+    let graphData = this.props.graphData;
+    this.graphDataObj = {};
+    graphData["nodes"].forEach(node => {
+      let id = node["id"];
+      this.graphDataObj[id] = {};
+      this.graphDataObj[id]["attrs"] = node["attrs"];
+      this.graphDataObj[id]["topo_attrs"] = node["topo_attrs"];
+    });
+    this.projectionData = this.props.projectionData;
+    this.clusterTypeNum = 10;
+    this.clusterObj = {};
+    this.dataSourceAnomaly = [];
+    this.dataSourceCluster = [];
+    for (let key in this.projectionData) {
+      let node = {};
+      node.id = key;
+      node.isAnomalyLocal = +this.projectionData[key]["an"];
+      node.isAnomalyGlobal = +globalData[key]["an"];
+      this.dataSourceAnomaly.push(node);
+      let clusterID = this.projectionData[key]["cl"];
+      if (this.clusterObj[clusterID] === undefined) {
+        this.clusterObj[clusterID] = [];
+      }
+      this.clusterObj[clusterID].push(key);
+    }
+    this.clusterMaxNum = 0;
+    for (let key in this.clusterObj) {
+      if (this.clusterObj[key].length > this.clusterMaxNum) {
+        this.clusterMaxNum = this.clusterObj[key].length;
+      }
+    }
+    for (let i = 0; i < this.clusterTypeNum; i++) {
+      let data = {};
+      data["key"] = i;
+      data["cluster_id"] = i;
+      for (let j = 0; j < this.clusterObj[i].length; j++) {
+        data["id_" + j] = this.clusterObj[i][j];
+      }
+      // for(let j = 0; j < this.clusterMaxNum; j++){
+      //   if(j<this.clusterObj[i].length){
+      //     data['id_'+j] = this.clusterObj[i][j];
+      //   } else {
+      //     data['id_'+j] = 'null';
+      //   }
+      // }
+      this.dataSourceCluster.push(data);
+    }
+    console.log(this.clusterMaxNum);
   }
   render() {
-    let projectionData = this.ProjectionData;
-    const dataSource = [
+    const rowSelectionAbnomaly = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        let node = this.graphDataObj[selectedRows[0]["id"]];
+        this.props.mainStore.setNodes([node]);
+        console.log(toJS(this.props.mainStore.selectedNodes));
+      }
+    };
+    const rowSelectionCluster = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        let node = this.clusterObj[selectedRows[0]["cluster_id"]].map(
+          id => this.graphDataObj[id]
+        );
+        this.props.mainStore.setNodes(node);
+        console.log(toJS(this.props.mainStore.selectedNodes));
+      }
+    };
+    const columnsAnomaly = [
       {
-        key: "1",
-        name: "胡彦斌",
-        age: 32,
-        address: "西湖区湖底公园1号"
+        title: "id",
+        dataIndex: "id",
+        key: "id"
       },
       {
-        key: "2",
-        name: "胡彦祖",
-        age: 42,
-        address: "西湖区湖底公园1号"
+        title: "local",
+        dataIndex: "isAnomalyLocal",
+        key: "isAnomalyLocal",
+        render: text => (
+          <Tag color={text === 1 ? "green" : "volcano"}>
+            {text === 1 ? "normal" : "abnormal"}
+          </Tag>
+        )
+      },
+      {
+        title: "global",
+        dataIndex: "isAnomalyGlobal",
+        key: "isAnomalyGlobal",
+        render: text => (
+          <Tag color={text === 1 ? "green" : "volcano"}>
+            {text === 1 ? "normal" : "abnormal"}
+          </Tag>
+        )
       }
     ];
+    const columnsCluster = [
+      {
+        title: "cluster",
+        dataIndex: "cluster_id",
+        key: "cluster_id",
+        fixed: "left",
+        width: 60
+      }
+    ];
+    for (let i = 0; i < this.clusterMaxNum; i++) {
+      columnsCluster.push({
+        title: "id_" + i,
+        dataIndex: "id_" + i,
+        key: "id_" + i,
+        width: 100
+      });
+    }
 
-    const columns = [
-      {
-        title: "姓名",
-        dataIndex: "name",
-        key: "name"
-      },
-      {
-        title: "年龄",
-        dataIndex: "age",
-        key: "age"
-      },
-      {
-        title: "住址",
-        dataIndex: "address",
-        key: "address"
-      }
-    ];
     return (
       <Tabs defaultActiveKey="1" type="card">
         <TabPane
@@ -58,7 +132,10 @@ class ProjectionView extends React.Component {
           }
           key="1"
         >
-          <Projection projectionData={projectionData} />
+          <Projection
+            projectionData={this.projectionData}
+            graphData={this.graphDataObj}
+          />
         </TabPane>
         <TabPane
           tab={
@@ -69,18 +146,43 @@ class ProjectionView extends React.Component {
           }
           key="2"
         >
-          <Table dataSource={dataSource} columns={columns} />
+          <Table
+            rowSelection={{
+              type: "radio",
+              ...rowSelectionAbnomaly
+            }}
+            dataSource={this.dataSourceAnomaly}
+            columns={columnsAnomaly}
+            tableLayout="fixed"
+            size="small"
+            scroll={{
+              x: "400px",
+              y: "300px"
+            }}
+          />
         </TabPane>
         <TabPane
           tab={
             <span>
               <Icon type="table" />
-              Community
+              Cluster
             </span>
           }
           key="3"
         >
-          <Table dataSource={dataSource} columns={columns} />
+          <Table
+            rowSelection={{
+              type: "radio",
+              ...rowSelectionCluster
+            }}
+            dataSource={this.dataSourceCluster}
+            columns={columnsCluster}
+            size="small"
+            scroll={{
+              x: 300,
+              y: 300
+            }}
+          />
         </TabPane>
       </Tabs>
     );
