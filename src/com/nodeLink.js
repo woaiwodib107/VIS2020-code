@@ -1,4 +1,6 @@
 import React from "react";
+import { observer, inject } from "mobx-react";
+import { toJS } from "mobx";
 import "./content.css";
 import { G } from "./G.js";
 import { Switch, Slider, Input } from "antd";
@@ -8,9 +10,12 @@ const marks = {
   1: "1",
   2: "2"
 };
+@inject("mainStore")
+@observer
 class NodeLink extends React.Component {
   constructor(props) {
     super(props);
+    this.hopNumber = 0;
     let GraphData = props.graphData;
     this.state = { date: new Date() };
     this.lassoNdoes = [];
@@ -49,23 +54,26 @@ class NodeLink extends React.Component {
       node.r = nodeStyle.r;
     });
   };
-  handleHopEvent = hopNumber => {
+  handleHopEvent = (
+    hopNumber = this.hopNumber,
+    values = toJS(this.props.mainStore.nodesList)
+  ) => {
+    // console.log(values);
+    this.hopNumber = hopNumber;
     const orange = { r: 255 / 255, g: 165 / 255, b: 0, a: 1 };
     const orange2 = { r: 255 / 255, g: 165 / 255, b: 0, a: 0.5 };
     const red = { r: 1, g: 0, b: 0, a: 1 };
     const { nodes } = this.props.graphData;
-    // const values = this.props.nodeList;
-    const values = [42300604419];
     this.initNode();
     values.forEach(value => {
-      const node = this.g.getNodeById(value.toString());
+      const node = this.g.getNodeById(value);
       if (node === undefined) {
-        alert("node===undefined");
+        console.log("node===undefined");
       } else {
         let one_hop_neighbours = [];
         let two_hop_neighbours = [];
         nodes.forEach(node_data => {
-          if (node_data.id === value.toString()) {
+          if (node_data.id === value) {
             node_data.edges.forEach(n => {
               const des_n = this.g.getNodeById(n.toString());
               one_hop_neighbours.push(des_n);
@@ -99,13 +107,14 @@ class NodeLink extends React.Component {
     });
   };
   render() {
+    const values = toJS(this.props.mainStore.nodesList);
     return (
       <div
         id="nodelink"
         style={{ position: "relative", width: "400px", height: "400px" }}
       >
         <canvas
-          id="nodelink-canvas"
+          id={"nodelink-canvas-" + this.props.no}
           style={{ position: "absolute" }}
           width="400"
           height="400"
@@ -126,7 +135,9 @@ class NodeLink extends React.Component {
               min={0}
               dots={true}
               step={1}
-              onAfterChange={hopNumber => this.handleHopEvent(hopNumber)}
+              onAfterChange={hopNumber =>
+                this.handleHopEvent(hopNumber, values)
+              }
             ></Slider>
           </div>
         </div>
@@ -134,7 +145,7 @@ class NodeLink extends React.Component {
     );
   }
   componentDidMount() {
-    const canvas = document.getElementById("nodelink-canvas");
+    const canvas = document.getElementById("nodelink-canvas-" + this.props.no);
     const width = canvas.width;
     const height = canvas.height;
     const g = this.g;
@@ -153,21 +164,15 @@ class NodeLink extends React.Component {
       node.r = nodeStyle.clickR;
       g.endBatch();
       g.refresh();
-      console.log(node);
     };
     g.nodes().forEach(node => {
       node.on("mousedown", node => {
         nodeClick(node);
       });
-      // node.on('drag', console.log)
     });
     g.initLasso(document.querySelector("#nodelink"));
     g.on("lasso", nodes => {
       g.beginBatch();
-      // this.lassoNdoes.forEach((n) => {
-      // 	n.fill = nodeStyle.fill
-      // 	n.r = nodeStyle.r
-      // })
       this.g.nodes().forEach(node => {
         node.fill = nodeStyle.fill;
         node.r = nodeStyle.r;
@@ -180,6 +185,10 @@ class NodeLink extends React.Component {
       g.endBatch();
       g.refresh();
     });
+    this.handleHopEvent();
+  }
+  componentDidUpdate() {
+    this.handleHopEvent();
   }
 }
 

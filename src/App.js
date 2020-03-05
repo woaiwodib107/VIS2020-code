@@ -5,6 +5,7 @@ import localGlobalData from "./data/attrs_distribution_topo_data/attrs_distribut
 import localData from "./data/pca_cluster_anomaly_data/42_trade_pca_cluster_anomaly";
 import NodeLink from "./com/nodeLink";
 import ProjectionView from "./com/projectionView";
+import CAView from "./com/caView";
 import Charts from "./com/barChart/charts";
 import "./com/content.css";
 function App() {
@@ -15,7 +16,7 @@ function App() {
         height: "1080px",
         padding: "10px",
         display: "grid",
-        gridTemplateColumns: "7fr 9fr",
+        gridTemplateColumns: "auto auto auto auto",
         gridTemplateRows: "1fr 1fr",
         gridGap: "10px",
         placeItems: "center center",
@@ -26,10 +27,50 @@ function App() {
         style={{
           width: "500px",
           placeSelf: "start center",
-          padding: "0px"
+          padding: "30px"
         }}
       >
         <ProjectionView localData={localData} graphData={graphData} />
+      </div>
+      <div
+        style={{
+          placeSelf: "center center",
+          padding: "30px"
+        }}
+      >
+        <span> control panel </span>
+      </div>
+      <div
+        style={{
+          width: "500px",
+          gridRowStart: "span 2",
+          placeSelf: "start center",
+          padding: "30px"
+        }}
+      >
+        <CAView localData={localData} graphData={graphData} />
+      </div>
+      <div
+        style={{
+          placeSelf: "start center"
+        }}
+      >
+        <Charts localGlobalData={localGlobalData} />
+      </div>
+      <div
+        style={{
+          placeSelf: "start center"
+        }}
+      >
+        <Charts localGlobalData={localGlobalData} />
+      </div>
+      <div
+        style={{
+          placeSelf: "start center",
+          padding: "30px"
+        }}
+      >
+        <NodeLink graphData={graphData} no={0} />
       </div>
       <div
         style={{
@@ -37,15 +78,7 @@ function App() {
           padding: "30px"
         }}
       >
-        <NodeLink graphData={graphData} />
-      </div>
-      <div
-        style={{
-          gridRowStart: "span 2",
-          placeSelf: "center center"
-        }}
-      >
-        <Charts localGlobalData={localGlobalData} />
+        <NodeLink graphData={graphData} no={1} />
       </div>
     </div>
   );

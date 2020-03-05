@@ -63,18 +63,22 @@ class ProjectionView extends React.Component {
   render() {
     const rowSelectionAbnomaly = {
       onChange: (selectedRowKeys, selectedRows) => {
-        let node = this.graphDataObj[selectedRows[0]["id"]];
-        this.props.mainStore.setNodes([node]);
-        console.log(toJS(this.props.mainStore.selectedNodes));
+        let id = selectedRows[0]["id"];
+        let nodesAttr = this.graphDataObj[id];
+        this.props.mainStore.setNodesList([id]);
+        this.props.mainStore.setNodes([nodesAttr]);
+        // console.log(toJS(this.props.mainStore.selectedNodes));
+        console.log(toJS(this.props.mainStore.nodesList));
       }
     };
     const rowSelectionCluster = {
       onChange: (selectedRowKeys, selectedRows) => {
-        let node = this.clusterObj[selectedRows[0]["cluster_id"]].map(
-          id => this.graphDataObj[id]
-        );
-        this.props.mainStore.setNodes(node);
-        console.log(toJS(this.props.mainStore.selectedNodes));
+        let nodesID = this.clusterObj[selectedRows[0]["cluster_id"]];
+        let nodesAttr = nodesID.map(id => this.graphDataObj[id]);
+        this.props.mainStore.setNodesList(nodesAttr);
+        this.props.mainStore.setNodes(nodesAttr);
+        // console.log(toJS(this.props.mainStore.selectedNodes));
+        console.log(toJS(this.props.mainStore.nodesList));
       }
     };
     const columnsAnomaly = [
@@ -121,73 +125,14 @@ class ProjectionView extends React.Component {
         width: 100
       });
     }
-
     return (
-      <Tabs defaultActiveKey="1" type="card">
-        <TabPane
-          tab={
-            <span>
-              <Icon type="dot-chart" />
-              Projection
-            </span>
-          }
-          key="1"
-        >
-          <Projection
-            localData={this.localData}
-            graphData={this.graphDataObj}
-            globalData={globalData}
-          />
-        </TabPane>
-        <TabPane
-          tab={
-            <span>
-              <Icon type="table" />
-              Anormaly
-            </span>
-          }
-          key="2"
-        >
-          <Table
-            rowSelection={{
-              type: "radio",
-              ...rowSelectionAbnomaly
-            }}
-            dataSource={this.dataSourceAnomaly}
-            columns={columnsAnomaly}
-            tableLayout="fixed"
-            size="small"
-            scroll={{
-              x: 500,
-              y: 500
-            }}
-          />
-        </TabPane>
-        <TabPane
-          tab={
-            <span>
-              <Icon type="table" />
-              Cluster
-            </span>
-          }
-          key="3"
-        >
-          <Table
-            rowSelection={{
-              type: "radio",
-              ...rowSelectionCluster
-            }}
-            dataSource={this.dataSourceCluster}
-            columns={columnsCluster}
-            size="small"
-            pagination={false}
-            scroll={{
-              x: 500,
-              y: 500
-            }}
-          />
-        </TabPane>
-      </Tabs>
+      <div>
+        <Projection
+          localData={this.localData}
+          graphData={this.graphDataObj}
+          globalData={globalData}
+        />
+      </div>
     );
   }
 }

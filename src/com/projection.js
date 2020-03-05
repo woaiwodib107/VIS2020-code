@@ -104,13 +104,15 @@ class Projection extends React.Component {
         id="projection"
         style={{ position: "relative", width: "500px", height: "500px" }}
       >
-        <canvas
-          id="projection-canvas"
-          style={{ position: "absolute" }}
-          width="500"
-          height="500"
-        ></canvas>
-        <div style={{ position: "absolute" }}>
+        <div>
+          <canvas
+            id="projection-canvas"
+            style={{ position: "absolute" }}
+            width="500"
+            height="500"
+          ></canvas>
+        </div>
+        <div>
           <div style={{ marginTop: -12 }}>
             <Radio.Group defaultValue="a" size="small">
               <Radio.Button value="a">pca</Radio.Button>
@@ -154,13 +156,17 @@ class Projection extends React.Component {
       this.nodeRefresh(width, height);
       this.lassoNdoes = nodes;
       let nodesAttr = [];
+      let nodesId = [];
       nodes.forEach(n => {
+        nodesId.push(n.id);
         nodesAttr.push(graphData[n.id]);
         n.fill = nodeStyle.lassoFill;
         n.r = nodeStyle.lassoR;
       });
+      this.props.mainStore.setNodesList(nodesId);
       this.props.mainStore.setNodes(nodesAttr);
-      console.log(toJS(this.props.mainStore.selectedNodes));
+      console.log(toJS(this.props.mainStore.nodesList));
+      // console.log(toJS(this.props.mainStore.selectedNodes));
       g.endBatch();
       g.refresh();
     });

@@ -130,8 +130,8 @@ class Charts extends React.Component {
     return (
       <div
         style={{
-          height: 1000,
-          width: 900,
+          height: 480,
+          width: 400,
           padding: "20px",
           display: "grid",
           gridTemplateColumns: "auto auto",
@@ -142,14 +142,14 @@ class Charts extends React.Component {
         {graphData.map((r, i) => {
           return (
             <div
-              style={{ height: 250, border: "1px solid #e8e8e8" }}
+              style={{ height: 160, border: "1px solid #e8e8e8" }}
               key={r.title}
               className={r.title}
             >
               <div className={"title-top"}>{r.title}属性分布图</div>
               <Bar
-                width={420}
-                height={200}
+                width={200}
+                height={100}
                 data={r.data}
                 colorScheme={r.type}
               />
