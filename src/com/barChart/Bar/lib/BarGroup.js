@@ -211,7 +211,7 @@ export default class BarGroup extends React.Component {
          <ToolTip
           textStyle="tooltip-text"
           bgStyle="tooltip-bg"
-          format={ d3.format(".0%")}
+          format={ d3.format("")}
           tooltip={this.state.tooltip}
           />
       </g>
