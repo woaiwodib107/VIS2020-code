@@ -38,9 +38,9 @@ class Projection extends React.Component {
     this.nodeRefresh = (width, height) => {
       this.g.beginBatch();
       let publicFunc = (node, i) => {
-        node.strokeWidth = nodeStyle.strokeWidth;
         node.renderID = i;
         node.r = nodeStyle.r;
+        node.strokeWidth = nodeStyle.strokeWidth;
         node.strokeColor = nodeStyle.strokeColor;
         node.x = ((+localData[node.id]["pca"][0] + 0.05) / 0.15) * width;
         node.y = ((+localData[node.id]["pca"][1] + 0.02) / 0.1) * height;
@@ -110,28 +110,30 @@ class Projection extends React.Component {
           width="500"
           height="500"
         ></canvas>
-        <div style={{ marginTop: -12 }}>
-          <Radio.Group defaultValue="a" size="small">
-            <Radio.Button value="a">pca</Radio.Button>
-            <Radio.Button value="b" disabled>
-              mds
-            </Radio.Button>
-            <Radio.Button value="c" disabled>
-              tsne
-            </Radio.Button>
-          </Radio.Group>
-        </div>
-        <div style={{ marginTop: 2 }}>
-          <Radio.Group
-            defaultValue="0"
-            size="small"
-            onChange={this.encodeOnChange}
-          >
-            <Radio.Button value="0">local: cluster</Radio.Button>
-            <Radio.Button value="1">local: anomaly</Radio.Button>
-            <Radio.Button value="2">global: cluster</Radio.Button>
-            <Radio.Button value="3">global: anomaly</Radio.Button>
-          </Radio.Group>
+        <div style={{ position: "absolute" }}>
+          <div style={{ marginTop: -12 }}>
+            <Radio.Group defaultValue="a" size="small">
+              <Radio.Button value="a">pca</Radio.Button>
+              <Radio.Button value="b" disabled>
+                mds
+              </Radio.Button>
+              <Radio.Button value="c" disabled>
+                tsne
+              </Radio.Button>
+            </Radio.Group>
+          </div>
+          <div style={{ marginTop: 2 }}>
+            <Radio.Group
+              defaultValue="0"
+              size="small"
+              onChange={this.encodeOnChange}
+            >
+              <Radio.Button value="0">local: cluster</Radio.Button>
+              <Radio.Button value="1">local: anomaly</Radio.Button>
+              <Radio.Button value="2">global: cluster</Radio.Button>
+              <Radio.Button value="3">global: anomaly</Radio.Button>
+            </Radio.Group>
+          </div>
         </div>
       </div>
     );
@@ -149,9 +151,6 @@ class Projection extends React.Component {
     g.on("pan", () => {});
     g.on("lasso", nodes => {
       g.beginBatch();
-      const canvas = document.getElementById("projection-canvas");
-      const width = canvas.width;
-      const height = canvas.height;
       this.nodeRefresh(width, height);
       this.lassoNdoes = nodes;
       let nodesAttr = [];
