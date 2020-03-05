@@ -2,9 +2,14 @@
     fill: white;
     /* stroke: rgb(174,174,174); */
     opacity: 0.9;
+    pointer-events: none;
+}
+.tooltip {
+    pointer-events: none;
 }
 .tooltip-text { 
     font-size: 10px;
+    pointer-events: none;
 }
 .grid > line{
         stroke: #a6a6a6;    
@@ -15,4 +20,5 @@
 }
 .rect {
     stroke-width: 2px;
+   
 }

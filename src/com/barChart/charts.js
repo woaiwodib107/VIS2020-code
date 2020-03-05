@@ -131,7 +131,7 @@ class Charts extends React.Component {
       <div
         style={{
           height: 1000,
-          width: 800,
+          width: 900,
           padding: "20px",
           display: "grid",
           gridTemplateColumns: "auto auto",
@@ -148,7 +148,7 @@ class Charts extends React.Component {
             >
               <div className={"title-top"}>{r.title}属性分布图</div>
               <Bar
-                width={350}
+                width={420}
                 height={200}
                 data={r.data}
                 colorScheme={r.type}

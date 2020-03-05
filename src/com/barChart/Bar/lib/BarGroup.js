@@ -8,6 +8,7 @@ import Axis from './Axis'
 import ToolTip from './ToolTip'
 import Grid from './Grid'
 import { BarGroupPropTypes, BarGroupDefaultProps } from './props';
+import { TransitionMotion, spring } from 'react-motion';
 import * as d3 from 'd3';
 
 export default class BarGroup extends React.Component {
@@ -101,10 +102,10 @@ export default class BarGroup extends React.Component {
               }
             },
             style: {
-              x: x,
-              y: y,
-              height: height,
-              width: width,
+              x: spring(x),
+              y: spring(y),
+              height: spring(height),
+              width: spring(width),
             },
           });
         })
@@ -161,9 +162,12 @@ export default class BarGroup extends React.Component {
         .domain(level);
     }
     xScale = xTransform ? xScale.range(xScale.range().map(d => xTransform.applyX(d))) : xScale;
-    let renderData = this.generateStyles(xScale, yScale, getColor)
+   // let renderData = this.generateStyles(xScale, yScale, getColor)
     let barPart = (
-      renderData.map(d=> {
+      <TransitionMotion styles={this.generateStyles(xScale, yScale, getColor)}>
+      {interpolatedStyles => (
+      <g>
+       {interpolatedStyles.map(d => {
         return (
           <g key={d.key}>
               <rect
@@ -179,8 +183,11 @@ export default class BarGroup extends React.Component {
               onMouseLeave={(e)=>this.hideToolTip()}
               />
               </g>
-        )
-      })
+              );
+            })}
+          </g>
+        )}
+      </TransitionMotion>
     );
 
     return (
@@ -211,7 +218,7 @@ export default class BarGroup extends React.Component {
          <ToolTip
           textStyle="tooltip-text"
           bgStyle="tooltip-bg"
-          format={ d3.format(".0%")}
+          format={ d3.format("")}
           tooltip={this.state.tooltip}
           />
       </g>

@@ -2,6 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as d3 from 'd3';
 export default class ToolTip extends React.PureComponent {
+  numberToExponential(d){
+    let _index = d.lastIndexOf('-')
+    if(_index != -1){
+       let d0 = d.substring(0,_index-1)
+    let d1 = d.substring(_index + 1)
+    return `${Number(d0).toPrecision(2)}-${Number(d1).toPrecision(2)}`
+    }
+    return d
+  }
   render () {
     let visibility = 'hidden';
     let transform = '';
@@ -31,7 +40,7 @@ export default class ToolTip extends React.PureComponent {
     }
 
     return (
-      <g transform={transform}>
+      <g transform={transform}  className={'tooltip'}>
         <rect
           className={this.props.bgStyle}
           width={width}
@@ -57,7 +66,7 @@ export default class ToolTip extends React.PureComponent {
         )}
         <text visibility={visibility} transform={transformText}>
           <tspan x="0" className={this.props.textStyle} textAnchor="middle" dy="5px">
-            {this.props.tooltip.data.key + ' : ' + this.props.format(this.props.tooltip.data.value)}
+            {this.numberToExponential(this.props.tooltip.data.key) + ' : ' + this.props.format(this.props.tooltip.data.value)}
           </tspan>
         </text>
       </g>
