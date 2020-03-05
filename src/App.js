@@ -36,7 +36,7 @@ function App() {
           padding: "30px"
         }}
       >
-        {/* <NodeLink graphData={graphData} /> */}
+        <NodeLink graphData={graphData} />
       </div>
       <div
         style={{
