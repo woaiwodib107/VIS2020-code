@@ -55,39 +55,20 @@ class NodeLink extends React.Component {
     const red = { r: 1, g: 0, b: 0, a: 1 };
     const { nodes } = this.props.graphData;
     // const values = this.props.nodeList;
-    const values = [1300423168, 1300550662];
+    const values = [42300604419];
     this.initNode();
     values.forEach(value => {
       const node = this.g.getNodeById(value.toString());
       if (node === undefined) {
         alert("node===undefined");
       } else {
-        let links = this.g.links();
         let one_hop_neighbours = [];
         let two_hop_neighbours = [];
-        let getNeighbours = (node, item, node_container) => {
-          if (item.source === node) {
-            node_container.push(item.target);
-          } else if (item.target === node) {
-            node_container.push(item.source);
-          }
-        };
-        links.forEach(item => {
-          if (item.source === node) {
-            one_hop_neighbours.push(item.target);
-            let one_hop_node = item.target;
-            links.forEach(item => {
-              if (item.source !== node && item.target !== node) {
-                getNeighbours(one_hop_node, item, two_hop_neighbours);
-              }
-            });
-          } else if (item.target === node) {
-            one_hop_neighbours.push(item.source);
-            let one_hop_node = item.source;
-            links.forEach(item => {
-              if (item.source !== node && item.target !== node) {
-                getNeighbours(one_hop_node, item, two_hop_neighbours);
-              }
+        nodes.forEach(node_data => {
+          if (node_data.id === value.toString()) {
+            node_data.edges.forEach(n => {
+              const des_n = this.g.getNodeById(n.toString());
+              one_hop_neighbours.push(des_n);
             });
           }
         });
@@ -96,11 +77,22 @@ class NodeLink extends React.Component {
             item.fill = orange;
             item.r = 10;
           });
-        else if (hopNumber === 2)
+        else if (hopNumber === 2) {
+          one_hop_neighbours.forEach(item => {
+            nodes.forEach(node_data => {
+              if (node_data.id === item.id) {
+                node_data.edges.forEach(n => {
+                  const des_n = this.g.getNodeById(n.toString());
+                  if (des_n !== node) two_hop_neighbours.push(des_n);
+                });
+              }
+            });
+          });
           two_hop_neighbours.forEach(item => {
             item.fill = orange2;
             item.r = 10;
           });
+        }
         node.fill = red;
         this.g.refresh();
       }
@@ -133,7 +125,7 @@ class NodeLink extends React.Component {
               max={3}
               min={0}
               dots={true}
-              step={10}
+              step={1}
               onAfterChange={hopNumber => this.handleHopEvent(hopNumber)}
             ></Slider>
           </div>
