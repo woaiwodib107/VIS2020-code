@@ -33,6 +33,7 @@ class Charts extends React.Component {
     let overView = [];
     let graphTitles = Object.keys(localGlobalData).slice(0, 6);
     for (let i = 0; i < graphTitles.length; i++) {
+      let xBand = {}
       let title = graphTitles[i];
       let type = localGlobalData[title].num === 2 ? "category1" : "yellow";
       let totalLocal = eval(localGlobalData[title].local_42.join("+"));
@@ -47,19 +48,23 @@ class Charts extends React.Component {
             (localGlobalData[title].global_4_42[i] / globalLocal) * 100
           ) + 1;
 
-        // 0的情况用1代替
+        // 将分段存下来
+        for(let key in localData){
+          xBand[key] = 0
+        }
       });
       overView.push({
         title,
         type,
+        xBand,
         data: [localData, globalData]
       });
     }
     return overView;
   }
-  computed(nodes, title) {
+  computed(nodes, title, xBand) {
     const { localGlobalData } = this.props;
-    let nodesData = {};
+    let nodesData = { ...xBand};
     let sum = 0;
     nodes.map(node => {
       //[0]属性值  [1]属于哪一段
@@ -74,7 +79,9 @@ class Charts extends React.Component {
       }
     });
     for (let key in nodesData) {
-      nodesData[key] = parseInt((nodesData[key] / sum) * 100) + 1;
+      // if (key !== "state") {
+          nodesData[key] = parseInt((nodesData[key] / sum) * 100) + 1;
+      // }
     }
     nodesData.state = "nodes";
     return nodesData;
@@ -113,11 +120,14 @@ class Charts extends React.Component {
       d3.selectAll(".rect").attr("stroke", "none");
       this.state.renderData.forEach(d => {
         let data = [...d.data];
-        let nodesData = this.computed(selectedNodes, d.title);
+        let nodesData = this.computed(selectedNodes, d.title, d.xBand);
+        // debugger
+        console.log(nodesData)
         data.push(nodesData);
         graphData.push({
           title: d.title,
           type: d.type,
+          xBand: d.xBand,
           data
         });
       });

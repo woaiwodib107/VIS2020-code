@@ -60,6 +60,7 @@ export default class BarGroup extends React.Component {
       layout,
       padding,
     } = this.props;
+    // debugger
     let styles = [];
     var keys = [];
     for (var p1 in data[0]) {
@@ -76,7 +77,7 @@ export default class BarGroup extends React.Component {
                 : yScale(d[1] - d[0]);
 
           let x = layout === 'horizontal'
-                  ? xScale(0)
+                  ? xScale(1)
                   : xScale(d.data.state) +
                     ((xScale.bandwidth() - padding) / keys.length) * i +
                     padding / 2;
@@ -87,7 +88,7 @@ export default class BarGroup extends React.Component {
 
 
           let width =layout === 'horizontal'
-                  ? xScale(d[1] - d[0]) -  xScale(0)
+                  ? xScale(d[1] - d[0]) -  xScale(1)
                   : (xScale.bandwidth() - padding) / keys.length;
 
           width = width > 0 ? width : 0;
