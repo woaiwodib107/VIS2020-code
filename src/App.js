@@ -6,6 +6,7 @@ import localData from "./data/pca_cluster_anomaly_data/42_trade_pca_cluster_anom
 import NodeLink from "./com/nodeLink";
 import ProjectionView from "./com/projectionView";
 import Charts from "./com/barChart/charts";
+import "./com/content.css";
 function App() {
   return (
     <div
