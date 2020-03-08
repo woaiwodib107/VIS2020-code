@@ -110,35 +110,54 @@ class NodeLink extends React.Component {
     const values = toJS(this.props.mainStore.nodesList);
     return (
       <div
-        id="nodelink"
-        style={{ position: "relative", width: "400px", height: "400px" }}
+        style={{
+          width: "410px",
+          height: "1050px",
+          border: "5px solid"
+        }}
       >
-        <canvas
-          id={"nodelink-canvas-" + this.props.no}
-          style={{ position: "absolute" }}
-          width="400"
-          height="400"
-        ></canvas>
-        <div>
-          <div className="inline">
-            <Switch
-              checkedChildren="ON"
-              unCheckedChildren="OFF"
-              defaultChecked
-              onChange={this.switchOnchange}
-            />
-          </div>
-          <div className="inline" style={{ width: 250, marginLeft: 50 }}>
-            <Slider
-              marks={marks}
-              max={3}
-              min={0}
-              dots={true}
-              step={1}
-              onAfterChange={hopNumber =>
-                this.handleHopEvent(hopNumber, values)
-              }
-            ></Slider>
+        <div
+          style={{
+            width: 400,
+            borderBottom: "5px solid",
+            margin: "0px",
+            fontSize: "20px",
+            padding: "10px"
+          }}
+        >
+          Nodelink View
+        </div>
+        <div
+          id="nodelink"
+          style={{ position: "relative", width: "400px", height: "400px" }}
+        >
+          <canvas
+            id={"nodelink-canvas-" + this.props.no}
+            style={{ position: "absolute" }}
+            width="400"
+            height="400"
+          ></canvas>
+          <div>
+            <div className="inline">
+              <Switch
+                checkedChildren="ON"
+                unCheckedChildren="OFF"
+                defaultChecked
+                onChange={this.switchOnchange}
+              />
+            </div>
+            <div className="inline" style={{ width: 250, marginLeft: 50 }}>
+              <Slider
+                marks={marks}
+                max={3}
+                min={0}
+                dots={true}
+                step={1}
+                onAfterChange={hopNumber =>
+                  this.handleHopEvent(hopNumber, values)
+                }
+              ></Slider>
+            </div>
           </div>
         </div>
       </div>

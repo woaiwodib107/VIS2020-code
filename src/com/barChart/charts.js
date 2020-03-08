@@ -33,7 +33,7 @@ class Charts extends React.Component {
     let overView = [];
     let graphTitles = Object.keys(localGlobalData).slice(0, 6);
     for (let i = 0; i < graphTitles.length; i++) {
-      let xBand = {}
+      let xBand = {};
       let title = graphTitles[i];
       let type = localGlobalData[title].num === 2 ? "category1" : "yellow";
       let totalLocal = eval(localGlobalData[title].local_42.join("+"));
@@ -49,8 +49,8 @@ class Charts extends React.Component {
           ) + 1;
 
         // 将分段存下来
-        for(let key in localData){
-          xBand[key] = 0
+        for (let key in localData) {
+          xBand[key] = 0;
         }
       });
       overView.push({
@@ -64,7 +64,7 @@ class Charts extends React.Component {
   }
   computed(nodes, title, xBand) {
     const { localGlobalData } = this.props;
-    let nodesData = { ...xBand};
+    let nodesData = { ...xBand };
     let sum = 0;
     nodes.map(node => {
       //[0]属性值  [1]属于哪一段
@@ -80,7 +80,7 @@ class Charts extends React.Component {
     });
     for (let key in nodesData) {
       // if (key !== "state") {
-          nodesData[key] = parseInt((nodesData[key] / sum) * 100) + 1;
+      nodesData[key] = parseInt((nodesData[key] / sum) * 100) + 1;
       // }
     }
     nodesData.state = "nodes";
@@ -122,7 +122,7 @@ class Charts extends React.Component {
         let data = [...d.data];
         let nodesData = this.computed(selectedNodes, d.title, d.xBand);
         // debugger
-        console.log(nodesData)
+        // console.log(nodesData)
         data.push(nodesData);
         graphData.push({
           title: d.title,
@@ -140,32 +140,51 @@ class Charts extends React.Component {
     return (
       <div
         style={{
-          height: 480,
-          width: 400,
-          padding: "20px",
-          display: "grid",
-          gridTemplateColumns: "auto auto",
-          gridTemplateRows: "auto",
-          gridGap: "10px"
+          width: "710px",
+          height: "1050px",
+          border: "5px solid"
         }}
       >
-        {graphData.map((r, i) => {
-          return (
-            <div
-              style={{ height: 160, border: "1px solid #e8e8e8" }}
-              key={r.title}
-              className={r.title}
-            >
-              <div className={"title-top"}>{r.title}属性分布图</div>
-              <Bar
-                width={200}
-                height={100}
-                data={r.data}
-                colorScheme={r.type}
-              />
-            </div>
-          );
-        })}
+        <div
+          style={{
+            width: 700,
+            borderBottom: "5px solid",
+            margin: "0px",
+            fontSize: "20px",
+            padding: "10px"
+          }}
+        >
+          Distribution View
+        </div>
+        <div
+          style={{
+            height: 500,
+            width: 700,
+            padding: "20px",
+            display: "grid",
+            gridTemplateColumns: "auto auto",
+            gridTemplateRows: "auto",
+            gridGap: "10px"
+          }}
+        >
+          {graphData.map((r, i) => {
+            return (
+              <div
+                style={{ height: 150, border: "1px solid #e8e8e8" }}
+                key={r.title}
+                className={r.title}
+              >
+                <div className={"title-top"}>{r.title}属性分布图</div>
+                <Bar
+                  width={300}
+                  height={90}
+                  data={r.data}
+                  colorScheme={r.type}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   }

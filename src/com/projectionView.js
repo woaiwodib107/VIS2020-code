@@ -1,140 +1,178 @@
 import React from "react";
 import { observer, inject } from "mobx-react";
 import { toJS } from "mobx";
-import Projection from "./projection";
-import globalData from "../data/pca_cluster_anomaly_data/4_and_42_trade_pca_cluster_anomaly";
-import { Tabs, Icon, Table, Tag, Radio } from "antd";
-const { TabPane } = Tabs;
+import { G } from "./G.js";
+import { Radio } from "antd";
+import { nodeStyle } from "../style/nodeLinkStyle";
+
 @inject("mainStore")
 @observer
 class ProjectionView extends React.Component {
   constructor(props) {
     super(props);
-    let graphData = this.props.graphData;
-    this.graphDataObj = {};
-    graphData["nodes"].forEach(node => {
-      let id = node["id"];
-      this.graphDataObj[id] = {};
-      this.graphDataObj[id]["attrs"] = node["attrs"];
-      this.graphDataObj[id]["topo_attrs"] = node["topo_attrs"];
-    });
-    this.localData = this.props.localData;
-    this.clusterTypeNum = 10;
-    this.clusterObj = {};
-    this.dataSourceAnomaly = [];
-    this.dataSourceCluster = [];
-    for (let key in this.localData) {
+    const colorScheme = [
+      { r: 141 / 255, g: 211 / 255, b: 199 / 255, a: 1.0 },
+      { r: 255 / 255, g: 255 / 255, b: 179 / 255, a: 1.0 },
+      { r: 190 / 255, g: 186 / 255, b: 218 / 255, a: 1.0 },
+      { r: 251 / 255, g: 128 / 255, b: 114 / 255, a: 1.0 },
+      { r: 128 / 255, g: 177 / 255, b: 211 / 255, a: 1.0 },
+      { r: 253 / 255, g: 180 / 255, b: 98 / 255, a: 1.0 },
+      { r: 179 / 255, g: 222 / 255, b: 105 / 255, a: 1.0 },
+      { r: 252 / 255, g: 205 / 255, b: 229 / 255, a: 1.0 },
+      { r: 217 / 255, g: 217 / 255, b: 217 / 255, a: 1.0 },
+      { r: 188 / 255, g: 128 / 255, b: 189 / 255, a: 1.0 }
+    ];
+    let localData = this.props.localData;
+    let globalData = this.props.globalData;
+    let LocalData = { nodes: [], links: [] };
+    this.encodeMode = 0;
+    for (let key in localData) {
       let node = {};
       node.id = key;
-      node.isAnomalyLocal = +this.localData[key]["an"];
-      node.isAnomalyGlobal = +globalData[key]["an"];
-      if (node.isAnomalyLocal !== 1 || node.isAnomalyGlobal !== 1) {
-        this.dataSourceAnomaly.push(node);
-      }
-      let clusterID = this.localData[key]["cl"];
-      if (this.clusterObj[clusterID] === undefined) {
-        this.clusterObj[clusterID] = [];
-      }
-      this.clusterObj[clusterID].push(key);
+      LocalData["nodes"].push(node);
     }
-    this.clusterMaxNum = 0;
-    for (let key in this.clusterObj) {
-      if (this.clusterObj[key].length > this.clusterMaxNum) {
-        this.clusterMaxNum = this.clusterObj[key].length;
+    this.lassoNdoes = [];
+    this.g = new G({
+      data: LocalData
+    });
+    this.nodeRefresh = (width, height) => {
+      this.g.beginBatch();
+      let publicFunc = (node, i) => {
+        node.renderID = i;
+        node.r = nodeStyle.r;
+        node.strokeWidth = nodeStyle.strokeWidth;
+        node.strokeColor = nodeStyle.strokeColor;
+        node.x = ((+localData[node.id]["pca"][0] + 0.05) / 0.15) * width;
+        node.y = ((+localData[node.id]["pca"][1] + 0.02) / 0.1) * height;
+      };
+      switch (this.encodeMode) {
+        case 0:
+          {
+            this.g.nodes().forEach((node, i) => {
+              node.fill = colorScheme[+localData[node.id]["cl"]];
+              publicFunc(node, i);
+            });
+          }
+          break;
+        case 1:
+          {
+            this.g.nodes().forEach((node, i) => {
+              node.fill =
+                +localData[node.id]["an"] === -1
+                  ? nodeStyle.fill
+                  : { r: 0, g: 0, b: 0, a: 1.0 };
+              publicFunc(node, i);
+            });
+          }
+          break;
+        case 2:
+          {
+            this.g.nodes().forEach((node, i) => {
+              node.fill = colorScheme[+globalData[node.id]["cl"]];
+              publicFunc(node, i);
+            });
+          }
+          break;
+        case 3:
+          {
+            this.g.nodes().forEach((node, i) => {
+              node.fill =
+                +globalData[node.id]["an"] === -1
+                  ? nodeStyle.fill
+                  : { r: 0, g: 0, b: 0, a: 1.0 };
+              publicFunc(node, i);
+            });
+          }
+          break;
+        default: {
+        }
       }
-    }
-    for (let i = 0; i < this.clusterTypeNum; i++) {
-      let data = {};
-      data["key"] = i;
-      data["cluster_id"] = i;
-      for (let j = 0; j < this.clusterObj[i].length; j++) {
-        data["id_" + j] = this.clusterObj[i][j];
-      }
-      // for(let j = 0; j < this.clusterMaxNum; j++){
-      //   if(j<this.clusterObj[i].length){
-      //     data['id_'+j] = this.clusterObj[i][j];
-      //   } else {
-      //     data['id_'+j] = 'null';
-      //   }
-      // }
-      this.dataSourceCluster.push(data);
-    }
+      this.g.endBatch();
+      this.g.refresh();
+    };
+    this.encodeOnChange = e => {
+      this.encodeMode = +e.target.value;
+      const canvas = document.getElementById("projection-canvas");
+      const width = canvas.width;
+      const height = canvas.height;
+      this.nodeRefresh(width, height);
+    };
   }
   render() {
-    const rowSelectionAbnomaly = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        let id = selectedRows[0]["id"];
-        let nodesAttr = this.graphDataObj[id];
-        this.props.mainStore.setNodesList([id]);
-        this.props.mainStore.setNodes([nodesAttr]);
-        // console.log(toJS(this.props.mainStore.selectedNodes));
-        console.log(toJS(this.props.mainStore.nodesList));
-      }
-    };
-    const rowSelectionCluster = {
-      onChange: (selectedRowKeys, selectedRows) => {
-        let nodesID = this.clusterObj[selectedRows[0]["cluster_id"]];
-        let nodesAttr = nodesID.map(id => this.graphDataObj[id]);
-        this.props.mainStore.setNodesList(nodesAttr);
-        this.props.mainStore.setNodes(nodesAttr);
-        // console.log(toJS(this.props.mainStore.selectedNodes));
-        console.log(toJS(this.props.mainStore.nodesList));
-      }
-    };
-    const columnsAnomaly = [
-      {
-        title: "id",
-        dataIndex: "id",
-        key: "id"
-      },
-      {
-        title: "local",
-        dataIndex: "isAnomalyLocal",
-        key: "isAnomalyLocal",
-        render: text => (
-          <Tag color={text === 1 ? "green" : "volcano"}>
-            {text === 1 ? "normal" : "abnormal"}
-          </Tag>
-        )
-      },
-      {
-        title: "global",
-        dataIndex: "isAnomalyGlobal",
-        key: "isAnomalyGlobal",
-        render: text => (
-          <Tag color={text === 1 ? "green" : "volcano"}>
-            {text === 1 ? "normal" : "abnormal"}
-          </Tag>
-        )
-      }
-    ];
-    const columnsCluster = [
-      {
-        title: "cluster",
-        dataIndex: "cluster_id",
-        key: "cluster_id",
-        fixed: "left",
-        width: 60
-      }
-    ];
-    for (let i = 0; i < 30; i++) {
-      columnsCluster.push({
-        title: "id_" + i,
-        dataIndex: "id_" + i,
-        key: "id_" + i,
-        width: 100
-      });
-    }
     return (
-      <div>
-        <Projection
-          localData={this.localData}
-          graphData={this.graphDataObj}
-          globalData={globalData}
-        />
+      <div
+        id="projection"
+        style={{
+          position: "relative",
+          width: "458px",
+          height: "458px",
+          border: "2px solid",
+          padding: "2px"
+        }}
+      >
+        <canvas
+          id="projection-canvas"
+          style={{ position: "absolute" }}
+          width="450"
+          height="450"
+        ></canvas>
+        <div style={{ position: "absolute", zIndex: "999999" }}>
+          <div>
+            <Radio.Group defaultValue="a" size="small">
+              <Radio.Button value="a">pca</Radio.Button>
+              <Radio.Button value="b" disabled>
+                mds
+              </Radio.Button>
+              <Radio.Button value="c" disabled>
+                tsne
+              </Radio.Button>
+            </Radio.Group>
+          </div>
+          <div>
+            <Radio.Group
+              defaultValue="0"
+              size="small"
+              onChange={this.encodeOnChange}
+            >
+              <Radio.Button value="0">local: cluster</Radio.Button>
+              <Radio.Button value="1">local: anomaly</Radio.Button>
+              <Radio.Button value="2">global: cluster</Radio.Button>
+              <Radio.Button value="3">global: anomaly</Radio.Button>
+            </Radio.Group>
+          </div>
+        </div>
       </div>
     );
   }
+  componentDidMount() {
+    let graphData = this.props.graphData;
+    const canvas = document.getElementById("projection-canvas");
+    const width = canvas.width;
+    const height = canvas.height;
+    const g = this.g;
+    g.container(canvas);
+    this.nodeRefresh(width, height);
+    g.initLasso(document.querySelector("#projection"));
+    g.on("zoom", () => {});
+    g.on("pan", () => {});
+    g.on("lasso", nodes => {
+      g.beginBatch();
+      this.nodeRefresh(width, height);
+      this.lassoNdoes = nodes;
+      let nodesAttr = [];
+      let nodesId = [];
+      nodes.forEach(n => {
+        nodesId.push(n.id);
+        nodesAttr.push(graphData[n.id]);
+        n.fill = nodeStyle.lassoFill;
+        n.r = nodeStyle.lassoR;
+      });
+      this.props.mainStore.setNodesList(nodesId);
+      this.props.mainStore.setNodes(nodesAttr);
+      g.endBatch();
+      g.refresh();
+    });
+    this.g.toggleLasso(true);
+  }
 }
-
 export default ProjectionView;
